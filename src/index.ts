@@ -15,6 +15,8 @@ import { BotFrameworkAdapter } from 'botbuilder';
 
 // This bot's main dialog.
 import { KudoBot } from './bot';
+import { KudoStore } from './db/Kudostore';
+import { GetKudoHelpUseCase } from './kudo/GetKudoHelpUseCase';
 
 // Create HTTP server.
 const server = restify.createServer();
@@ -55,7 +57,8 @@ const onTurnErrorHandler = async (context, error) => {
 adapter.onTurnError = onTurnErrorHandler;
 
 // Create the main dialog.
-const myBot = new KudoBot();
+const botName = "KudoBot"
+const myBot = new KudoBot(botName, new KudoStore(), new GetKudoHelpUseCase(botName));
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {

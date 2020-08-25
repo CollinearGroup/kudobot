@@ -1,96 +1,15 @@
 const fs = require('fs');
 
 import {Activity, ChannelAccount, TurnContext, TeamsInfo } from 'botbuilder';
+import { Board } from '../kudo/KudoBoard';
+import { KudoRecord } from '../kudo/KudoRecord';
+import { Kudo } from '../kudo/Kudo';
 // class for the actual Kudo given and all its related information
-class Kudo {
-    constructor(
-        public text: string,
-        public giver: ChannelAccount,
-        public msgId: string,
-        public timestamp: Date,
-        public value: number =1){ }
-}
 
-class Person{
-    constructor(
-        public id: string,
-        public name: string)
-    {
-        this.lastKudoCleanup = new Date(0);
-    }
-    private kudos: Array<Kudo> = [];
-    private lastKudoCleanup: Date;
-    private lastCalcScore =0;
-    get score() {
-        this.cleanOldKudos();
-        return this.lastCalcScore;
-    }
-    
-    addKudo(srcMsg: Activity, value:number, time:Date = srcMsg.timestamp){
-        this.kudos.push(new Kudo(srcMsg.text, srcMsg.from, srcMsg.id, time, value));        
-        this.updateScore();
-        return this;
-    }
-    importKudos(kudos:Array<Kudo>){
-        for (const kudo of kudos){
-            kudo.timestamp = new Date(kudo.timestamp);
-            this.kudos.push(kudo);
-        }
-        this.updateScore();
-    }
-    private calcScore() {
-        let total = 0;
-        for (const kudo of this.kudos){
-            total += kudo.value;
-        }        
-        return total;
-    }
-    
-    updateScore(){
-        this.lastCalcScore = this.calcScore();
-    }
 
-    forceCleanOldKudos(): string{
-        return this.cleanOldKudos(true);
-    }
 
-    private cleanOldKudos(forceClean:boolean = false): string{
-        const daysToKeep = 30;
-        const cleanFrequency = 1/(24*12); // Every 5 minutes -- In days
-        const currentTime = new Date();
-        if (!forceClean && this.calcDaysSince(currentTime, this.lastKudoCleanup) < cleanFrequency){
-            return;
-        }
-        let oldKudos: Array<Kudo> = [];
-        
-        for (const kudo of this.kudos){           
-            if (this.calcDaysSince(currentTime, kudo.timestamp) > daysToKeep){
-                oldKudos.push(kudo);
-            } 
-        }
-        for (const kudo of oldKudos){
-            const oldKudoIndex = this.kudos.indexOf(kudo);
-            this.kudos.splice(oldKudoIndex,1);
-        }
-        this.lastKudoCleanup = currentTime;
-        this.updateScore();
-        return `${oldKudos.length} old kudos removed from ${this.name}.<br>`
-    }
 
-    private calcDaysSince(date1: Date, date2: Date):number{
-            const timeDiff = date1.getTime() - date2.getTime(); 
-            const DiffInDays = timeDiff / (3600 * 24) / 1000;
-            return DiffInDays;
-    }
-}
 
-class Board{
-    name: string;
-    people: Array<Person>;
-    constructor(people:Array<Person>= []){
-        this.people = people;
-    }
-}
 
 export class KudoStore {
     private boards: Map<string, Board>;
@@ -105,7 +24,7 @@ export class KudoStore {
         const boardId = this.getTeamId(msgContext.activity);
         this.ensureBoardExists(boardId, msgContext);
         let board = this.boards.get(boardId);
-        board.people = this.boards.get(boardId).people.sort((a:Person, b:Person)=>{
+        board.kudoRecords = this.boards.get(boardId).kudoRecords.sort((a:KudoRecord, b:KudoRecord)=>{
             if (a.score > b.score){
                 return -1;
             }
@@ -127,15 +46,15 @@ export class KudoStore {
                 for (const mapPair of boardsData){
                     const boardId = mapPair[0];
                     const board = mapPair[1];
-                    let newPeople:Array<Person> = [];
+                    let newRecords:Array<KudoRecord> = [];
                     // Not actualy an official Person object but its close enough
-                    for (const person of board.people){
-                        let newPerson = new Person(person.id, person.name);
-                        newPerson.importKudos(person.kudos);
-                        newPeople.push(newPerson);
+                    for (const record of board.records){
+                        let newRecord = new KudoRecord(record.id, record.name);
+                        newRecord.importKudos(record.kudos);
+                        newRecords.push(newRecord);
                     }
                     if (!this.boards.has(boardId)){
-                        let newBoard = new Board(newPeople);
+                        let newBoard = new Board(newRecords);
                         newBoard.name = board.name;                            
                         this.boards.set(boardId, newBoard);
                     }
@@ -187,7 +106,7 @@ export class KudoStore {
             for (let k = 0; k < kudosToMake; k++){
                 let oldDate = new Date();
                 oldDate.setDate(oldDate.getDay()-this.getRnd(0,60));
-                person.addKudo(msgContext.activity, 1, oldDate);
+                person.addKudo(new Kudo(msgContext.activity.text, msgContext.activity.from.id, oldDate, ));
             }
             output += `${kudosToMake} Kudos created for ${name}. <br>`;                
             output += person.forceCleanOldKudos();
@@ -209,12 +128,12 @@ export class KudoStore {
     }
     
     // little wrapper for addKudo so you can handle multiple people receiving a kudo from one message 
-    giveKudos(accts:Array<ChannelAccount>, msgContext:TurnContext, value:number = 1): Array<Person>{
-        let updatedPeople: Array<Person> = [];
+    giveKudos(accts:Array<ChannelAccount>, msgContext:TurnContext, value:number = 1): Array<KudoRecord>{
+        let updatedPeople: Array<KudoRecord> = [];
         for (const acct of accts){
             const boardId = this.getTeamId(msgContext.activity);
             this.ensureBoardExists(boardId, msgContext);
-            const person = this.getPerson(acct.id, acct.name, boardId).addKudo(msgContext.activity, value);
+            const person = this.getPerson(acct.id, acct.name, boardId).addKudo(new Kudo(msgContext.activity.text, msgContext.activity.from.id, new Date(), value));
             updatedPeople.push(person);
         }
         if (updatedPeople.length >0){
@@ -249,28 +168,28 @@ export class KudoStore {
 
     // if people gets too big -- search time might suck 
     private getPerson(id:string, name:string, boardId:string){
-        for(const person of this.boards.get(boardId).people){
-            if (person.id == id){
+        for(const person of this.boards.get(boardId).kudoRecords){
+            if (person.personId == id){
                 return person;
             }
         }
         // No person by that name was found. 
-        const newPerson = new Person(id, name);
-        this.boards.get(boardId).people.push(newPerson);
+        const newPerson = new KudoRecord(id, name);
+        this.boards.get(boardId).kudoRecords.push(newPerson);
         return newPerson; 
     }
 
     // people is a list of people to generate a leaderboard for 
     // numRecords is how many people from your people list to output (default = all records)
     // includeZeros allows you to specify if you'd like to include people from your list with a score of zero
-    genLeaderboardText(people: Array<Person>, numRecords: number = people.length, includeZeros: boolean = false){
+    genLeaderboardText(people: Array<KudoRecord>, numRecords: number = people.length, includeZeros: boolean = false){
         let boardText = ""; 
         for (const person of people){
             if (!includeZeros && person.score == 0){
                 continue;
             }
             const plural = person.score == 1? "":"s";                        
-            boardText += `   ${person.name} has ${person.score} point${plural}. <br>`
+            boardText += `   ${person.personName} has ${person.score} point${plural}. <br>`
             numRecords--;
             if (numRecords <= 0){
                 break;

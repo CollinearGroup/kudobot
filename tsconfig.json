@@ -4,9 +4,9 @@
     "target": "es2016",
     "module": "commonjs",
     "outDir": "./lib",
-    "rootDir": "./src",
     "sourceMap": true,
     "incremental": true,
-    "tsBuildInfoFile": "./lib/.tsbuildinfo"
-  }
+    "tsBuildInfoFile": "./lib/.tsbuildinfo",
+  },
+  "include": ["./src", "jest.config.js"]
 }
