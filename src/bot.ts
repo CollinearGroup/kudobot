@@ -9,14 +9,21 @@
 //TODO: do actual test cases
 
 import { ActivityHandler, MessageFactory, Mention, Activity, Entity, ChannelAccount, BrowserLocalStorage, TurnContext } from 'botbuilder';
-import { KudoStore } from './kudostore';
+import { KudoStore } from './db/Kudostore';
+import { GetKudoHelpUseCase } from './kudo/GetKudoHelpUseCase';
 
 export class KudoBot extends ActivityHandler {
-    private testing = true;
-    private botName = "KudoBot";
-    private kudoStore: KudoStore = new KudoStore();
-    constructor() {
+    private testing = process.env.IS_TESTING;
+    private botName;
+    private kudoStore: KudoStore;
+    private getKudoHelpUseCase: GetKudoHelpUseCase;
+
+    constructor(botName: string, kudoStore: KudoStore, getKudoHelpUseCase: GetKudoHelpUseCase) {
         super();
+
+        this.botName = botName;
+        this.kudoStore = kudoStore;
+        this.getKudoHelpUseCase = getKudoHelpUseCase;
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
         this.onMessage(async (context, next) => {                    
             const uniqueMentions = this.getMentions(context.activity); 
@@ -121,7 +128,7 @@ export class KudoBot extends ActivityHandler {
                 case "leaderboard":
                     const board = this.kudoStore.leaderboard(msgContext);
                     outputText += `---<b>${board.name}</b>---<br>`;
-                    outputText += this.kudoStore.genLeaderboardText(board.people);
+                    outputText += this.kudoStore.genLeaderboardText(board.kudoRecords);
                     break;
                 case "gendummydata":
                     if (this.testing){
@@ -141,22 +148,8 @@ export class KudoBot extends ActivityHandler {
                     outputText += `Saved.`;
                     break;
                 case "help":
-                    const params = this.getStuffAfter("@help", msgContext.activity.text);
-                    switch (params[0].trim()){
-                        case "leaderboard":
-                        case "@leaderboard":
-                            outputText += `"@${this.botName} @leaderboard" will output the current leaderboard`;
-                            break;
-                        case "gendummydata":
-                        case "@gendummydata":
-                            if (this.testing){
-                                outputText += `"@${this.botName} @genDummyData" will generate a bunch of dummy people and kudos`;
-                            }
-                            break;
-                        default:
-                            outputText += `"@${this.botName} @help @command" will output more info about that command.`;
-                            break;                                    
-                    }
+                    const command: string = this.getStuffAfter("@help", msgContext.activity.text)[0];
+                    outputText += this.getKudoHelpUseCase.getHelp(command.replace("@", ""))
                     break;
                 case "commands":
                 case "command":

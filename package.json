@@ -10,7 +10,8 @@
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "postinstall": "npm run build && node ./deploymentScripts/webConfigPrep.js",
         "start": "tsc --build && node ./lib/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
+        "test-watch": "jest --watch",
         "watch": "nodemon --watch ./src -e ts --exec \"npm run start\""
     },
     "repository": {
@@ -26,8 +27,11 @@
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
+        "@types/jest": "^26.0.10",
         "@types/restify": "8.4.2",
+        "jest": "^26.4.2",
         "nodemon": "~2.0.4",
+        "ts-jest": "^26.2.0",
         "tslint": "~6.1.2",
         "typescript": "~3.9.2"
     }

@@ -1,9 +1,12 @@
 import { ActivityHandler } from 'botbuilder';
+import { KudoStore } from './db/Kudostore';
+import { GetKudoHelpUseCase } from './kudo/GetKudoHelpUseCase';
 export declare class KudoBot extends ActivityHandler {
     private testing;
     private botName;
     private kudoStore;
-    constructor();
+    private getKudoHelpUseCase;
+    constructor(botName: string, kudoStore: KudoStore, getKudoHelpUseCase: GetKudoHelpUseCase);
     private getAtCmds;
     private getMentions;
     private handleAtMentions;
