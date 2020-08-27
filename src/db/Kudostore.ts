@@ -17,7 +17,7 @@ export class KudoStore {
     private localKudoStoreFile = "boards.json";
     private saveInterval: NodeJS.Timeout;
     constructor(){
-            this.tryLoad(this.localKudoStoreFile);
+        this.tryLoad(this.localKudoStoreFile);
         this.startSaverClock();
     }
     leaderboard(msgContext:TurnContext): Board{

@@ -15,7 +15,7 @@ test('Returns help for @leaderboard command', () => {
 
 test('Returns help text for @gendummydata command', () => {
   const currentIsTestingValue = process.env.IS_TESTING
-  process.env.IS_TESTING = true
+  process.env.IS_TESTING = "true"
   const getKudoHelpUseCase = new GetKudoHelpUseCase("KudoBot");
   const helpText = getKudoHelpUseCase.getHelp("gendummydata");
   expect(helpText).toContain("\"@KudoBot @genDummyData\" will generate a bunch of dummy people and kudos");
