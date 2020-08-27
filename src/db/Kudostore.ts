@@ -17,7 +17,7 @@ export class KudoStore {
     private localKudoStoreFile = "boards.json";
     private saveInterval: NodeJS.Timeout;
     constructor(){
-        this.tryLoad(this.localKudoStoreFile);
+            this.tryLoad(this.localKudoStoreFile);
         this.startSaverClock();
     }
     leaderboard(msgContext:TurnContext): Board{
@@ -47,12 +47,14 @@ export class KudoStore {
                     const boardId = mapPair[0];
                     const board: Board = mapPair[1];
                     let newRecords:Array<KudoRecord> = [];
-                    // Not actualy an official Person object but its close enough
-                    for (const record of board.kudoRecords){
-                        let newRecord = new KudoRecord(record.personName, record.personName);
-                        newRecord.importKudos(record.kudos);
-                        newRecords.push(newRecord);
-                    }
+                    // Not actualy an official board object but its close enough
+                    if (board.kudoRecords){
+                        for (const record of board.kudoRecords){
+                            let newRecord = new KudoRecord(record.personName, record.personName);
+                            newRecord.importKudos(record.kudos);
+                            newRecords.push(newRecord);
+                        }
+                    }                   
                     if (!this.boards.has(boardId)){
                         let newBoard = new Board(newRecords);
                         newBoard.name = board.name;                            
