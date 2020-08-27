@@ -39,17 +39,17 @@ export class KudoStore {
 
     private tryLoad(fileLoc: string){
         // TODO: actually make it load from a database
-        this.boards = new Map();
+        this.boards = new Map<string, Board>();
         fs.readFile(this.localKudoStoreFile, 'utf8', function(err, data){
             if(data){
                 const boardsData = JSON.parse(data);
                 for (const mapPair of boardsData){
                     const boardId = mapPair[0];
-                    const board = mapPair[1];
+                    const board: Board = mapPair[1];
                     let newRecords:Array<KudoRecord> = [];
                     // Not actualy an official Person object but its close enough
-                    for (const record of board.records){
-                        let newRecord = new KudoRecord(record.id, record.name);
+                    for (const record of board.kudoRecords){
+                        let newRecord = new KudoRecord(record.personName, record.personName);
                         newRecord.importKudos(record.kudos);
                         newRecords.push(newRecord);
                     }

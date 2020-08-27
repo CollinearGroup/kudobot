@@ -8,7 +8,7 @@ export class KudoRecord{
     {
         this.lastKudoCleanup = new Date(0);
     }
-    private kudos: Array<Kudo> = [];
+    public kudos: Array<Kudo> = [];
     private lastKudoCleanup: Date;
     private lastCalcScore =0;
     get score() {
