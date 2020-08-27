@@ -1,21 +1,19 @@
 export class GetKudoHelpUseCase {
+  private botName: string
 
-    private botName: string
+  constructor(botName: string) {
+    this.botName = botName
+  }
 
-    constructor(botName: string) {
-        this.botName = botName;
+  public getHelp(command = ""): string {
+    if (command === "leaderboard") {
+      return `"@${this.botName} @leaderboard" will output the current leaderboard`
     }
-
-    public getHelp(command = ""): string {
-        switch (command){
-            case "leaderboard":
-                return `"@${this.botName} @leaderboard" will output the current leaderboard`;
-            case "gendummydata":
-                if (process.env.IS_TESTING) {
-                    return `"@${this.botName} @genDummyData" will generate a bunch of dummy people and kudos`;
-                }
-            default:
-                return `"@${this.botName} @help @command" will output more info about that command.`;                                   
-        }
+    if (process.env.IS_TESTING) {
+      if (command === "gendummydata") {
+        return `"@${this.botName} @genDummyData" will generate a bunch of dummy people and kudos`
+      }
     }
+    return `"@${this.botName} @help @command" will output more info about that command.`
+  }
 }
