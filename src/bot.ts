@@ -7,25 +7,24 @@
 //TODO: point save/load at a database rather than local file
 //TODO: update help text
 //TODO: do actual test cases
+//TODO: add a way to display the source of kudo
 
 import { ActivityHandler, MessageFactory, Mention, Activity, Entity, ChannelAccount, BrowserLocalStorage, TurnContext } from 'botbuilder';
 import { KudoStore } from './db/Kudostore';
-import { GetKudoHelpUseCase } from './kudo/GetKudoHelpUseCase';
+import { getHelpText } from './bot/GetHelpText';
+import { HandleAtCmdUseCase } from './bot/HandleAtCmd';
 
 export class KudoBot extends ActivityHandler {
-    private testing = process.env.IS_TESTING;
     private botName;
     private kudoStore: KudoStore;
-    private getKudoHelpUseCase: GetKudoHelpUseCase;
 
-    constructor(botName: string, kudoStore: KudoStore, getKudoHelpUseCase: GetKudoHelpUseCase) {
+    constructor(kudoStore: KudoStore) {
         super();
 
-        this.botName = botName;
+        this.botName = process.env.BOT_NAME;
         this.kudoStore = kudoStore;
-        this.getKudoHelpUseCase = getKudoHelpUseCase;
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
-        this.onMessage(async (context, next) => {                    
+        this.onMessage(async (context, next) => {                 
             const uniqueMentions = this.getMentions(context.activity); 
             const containedAtCmds = this.getAtCmds(context.activity);
             
@@ -38,7 +37,8 @@ export class KudoBot extends ActivityHandler {
 
             // handle @commands
             if (containedAtCmds && containedAtCmds.length > 0){
-                replyText += this.handleAtCmds(containedAtCmds, context);               
+                const atCmdHandler = new HandleAtCmdUseCase(context, this.kudoStore);
+                replyText += atCmdHandler.handleCommands(containedAtCmds);               
             }
 
             // handle other
@@ -119,62 +119,6 @@ export class KudoBot extends ActivityHandler {
         return outputText;
     }
 
-    // given a list of commands, this function attempts to carry them out on the given message
-    private handleAtCmds(cmds: Array<string>, msgContext:TurnContext): string{
-        let outputText = "";
-        for (const cmd of cmds){
-            switch (cmd.toLowerCase()){
-                //TODO: add a way to display the source of kudos 
-                case "leaderboard":
-                    const board = this.kudoStore.leaderboard(msgContext);
-                    outputText += `---<b>${board.name}</b>---<br>`;
-                    outputText += this.kudoStore.genLeaderboardText(board.kudoRecords);
-                    break;
-                case "gendummydata":
-                    if (this.testing){
-                    outputText += this.kudoStore.genDummyData(10, msgContext);
-                    outputText += "Dummy data created.";
-                    }
-                    break;
-                case "clearboard":
-                case "@clearboard":
-                    // might consider adding some sort of way of double checking before blasting the whole thing
-                    this.kudoStore.clearBoard(msgContext);
-                    outputText += `Leaderboard cleared. I hope you meant to do that...`;
-                    break;
-                case "save":
-                case "@save":
-                    this.kudoStore.forceSave();
-                    outputText += `Saved.`;
-                    break;
-                case "help":
-                    const command: string = this.getStuffAfter("@help", msgContext.activity.text)[0];
-                    outputText += this.getKudoHelpUseCase.getHelp(command.replace("@", ""))
-                    break;
-                case "commands":
-                case "command":
-                default:
-                    outputText+= `Try one of these commands: @leaderboard @help or try giving Kudos with "@${this.botName} @person++".`;
-                    if (this.testing){
-                        outputText+= `<br>@genDummyData is also an option for testing purposes`;
-                    }
-                    break;
-            }
-            if (outputText != ""){
-                outputText += `<br>`;
-            }
-        }
-        return outputText;
-    }  
-
-    private getStuffAfter(keyWord:string, text:string):Array<string>{
-        // Grab everything after key word
-        let brokenText = text.split(keyWord);
-        if (brokenText.length<2){
-            return [];
-        } 
-        return brokenText[1].split(" ");
-    }
     // tries to determine who the ++ was attached to by looking for ++'s following @ mentions
     // if you'd like to include multiple ++'s to the same person, please specify uniqueOnly = false 
     private getTargets(modifier:string, message:Activity, mentionedAccts: Array<ChannelAccount>, uniqueOnly:boolean = true){
