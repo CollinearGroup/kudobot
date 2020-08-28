@@ -16,7 +16,6 @@ import { BotFrameworkAdapter } from 'botbuilder';
 // This bot's main dialog.
 import { KudoBot } from './bot';
 import { KudoStore } from './db/Kudostore';
-import { getKudoHelp } from './kudo/GetKudoHelp';
 
 // Create HTTP server.
 const server = restify.createServer();

@@ -11,8 +11,8 @@
 
 import { ActivityHandler, MessageFactory, Mention, Activity, Entity, ChannelAccount, BrowserLocalStorage, TurnContext } from 'botbuilder';
 import { KudoStore } from './db/Kudostore';
-import { getHelpText } from './bot/GetHelpText';
 import { HandleAtCmdUseCase } from './bot/HandleAtCmd';
+import { UsefulMessageData } from './bot/UsefulMessageData'
 
 export class KudoBot extends ActivityHandler {
     private botName;
@@ -24,21 +24,20 @@ export class KudoBot extends ActivityHandler {
         this.botName = process.env.BOT_NAME;
         this.kudoStore = kudoStore;
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
-        this.onMessage(async (context, next) => {                 
-            const uniqueMentions = this.getMentions(context.activity); 
-            const containedAtCmds = this.getAtCmds(context.activity);
-            
+        this.onMessage(async (context, next) => { 
+            const messageData = await new UsefulMessageData(context);                
+            await messageData.getTeamName(context, kudoStore.setName.bind(kudoStore));
             let replyText= "";
             
             // handle @mentions
-            if (uniqueMentions.length > 0){
-                replyText += this.handleAtMentions(uniqueMentions, context);               
+            if (messageData.uniqueMentions.length > 0){
+                replyText += this.handleAtMentions(messageData.uniqueMentions, messageData);               
             }
 
             // handle @commands
-            if (containedAtCmds && containedAtCmds.length > 0){
-                const atCmdHandler = new HandleAtCmdUseCase(context, this.kudoStore);
-                replyText += atCmdHandler.handleCommands(containedAtCmds);               
+            if (messageData.containedAtCmds && messageData.containedAtCmds.length > 0){
+                const atCmdHandler = new HandleAtCmdUseCase(messageData, this.kudoStore);
+                replyText += atCmdHandler.handleCommands(messageData.containedAtCmds);               
             }
 
             // handle other
@@ -56,61 +55,23 @@ export class KudoBot extends ActivityHandler {
         });
     }
 
-    // @mentions come through as enclosed in <at></at> tags. Whatever is left is @commands
-    // This function returns the words connected to those @ symbols. You'll need to do some work later to gather additional params for those commands
-    private getAtCmds(message: Activity):Array<string>{
-        if (!message.text.includes("@")){
-            return [];
-        }
-        let cmdWords: Array<string> = [];
-        const commands = message.text.split('@');
-        for (let i = 1; i< commands.length; i++){
-            // just grab the command word -- we can deal with the rest elsewhere
-            let cmd = commands[i].split(' ')[0];
-            // stupid newline messing stuff up.
-            cmdWords.push(cmd.split("\n")[0]);
-        }
-        return cmdWords;
-    }
-
-    // this method grabs all the mentions in the given activity -- It also scrubs mentions of the bot itself. 
-    // specify uniqueOnly false to include multiple mentions
-    private getMentions(message:Activity, uniqueOnly:boolean = true){
-        let mentions: Array<ChannelAccount> = [];
-            for (const entity of message.entities){
-                if (entity.type != "mention"){
-                    continue;
-                }
-                const mention = entity as Mention;
-                if (mention.mentioned.name.toLowerCase() === this.botName.toLowerCase()){
-                    continue;
-                }
-                mentions.push(mention.mentioned);
-            }
-            if (uniqueOnly){
-                //remove duplicate mentions
-                return Array.from(new Set(mentions));
-            }
-            return mentions;
-    }
-
     // This function handles all of the names passed to it as if they were @mentions
     // note: ++ targets must be officially @mentioned 
-    private handleAtMentions(uniqueMentions:Array<ChannelAccount>, msgContext: TurnContext): string{
+    private handleAtMentions(uniqueMentions:Array<ChannelAccount>, msgData: UsefulMessageData): string{
         
         let outputText = ""; 
         //= `Looks like you mentioned ${uniqueMentions.join("and ")} <br>`;
-        const kudoPeople = this.getTargets("++", msgContext.activity, uniqueMentions);
-        const negKudoPeople = this.getTargets("--", msgContext.activity, uniqueMentions);
+        const kudoPeople = this.getTargets("++", msgData, uniqueMentions);
+        const negKudoPeople = this.getTargets("--", msgData, uniqueMentions);
         
         if (kudoPeople.length > 0){
             // TODO: get value of kudo
-            const updatedPeople = this.kudoStore.giveKudos(kudoPeople, msgContext, 1);
+            const updatedPeople = this.kudoStore.giveKudos(kudoPeople, msgData, 1);
             outputText += this.kudoStore.genLeaderboardText(updatedPeople, updatedPeople.length, true);
         }
         if (negKudoPeople.length > 0){
             // TODO: get value of kudo
-            const updatedPeople = this.kudoStore.giveKudos(negKudoPeople, msgContext, -1);
+            const updatedPeople = this.kudoStore.giveKudos(negKudoPeople, msgData, -1);
             outputText += this.kudoStore.genLeaderboardText(updatedPeople, updatedPeople.length, true);
         }
         if (outputText != ""){
@@ -121,10 +82,10 @@ export class KudoBot extends ActivityHandler {
 
     // tries to determine who the ++ was attached to by looking for ++'s following @ mentions
     // if you'd like to include multiple ++'s to the same person, please specify uniqueOnly = false 
-    private getTargets(modifier:string, message:Activity, mentionedAccts: Array<ChannelAccount>, uniqueOnly:boolean = true){
+    private getTargets(modifier:string, msgData:UsefulMessageData, mentionedAccts: Array<ChannelAccount>, uniqueOnly:boolean = true){
         let kudoPeople: Array<ChannelAccount> = [];
         // cast text to lower and strip spaces
-        const lowerMsgText = message.text.toLowerCase().replace(/\s+/g, '');
+        const lowerMsgText = msgData.text.toLowerCase().replace(/\s+/g, '');
 
         for (const mentionedPerson of mentionedAccts){
             // cast text to lower and strip spaces
