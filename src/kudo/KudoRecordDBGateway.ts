@@ -1,6 +1,6 @@
 import { KudoRecord } from "./KudoRecord";
 
 export interface KudoRecordDBGateway {
-     save(kudoRecord: KudoRecord);
-     getRecord(personId: string, boardId: string);
+     save(boardId: string, kudoRecord: KudoRecord): void;
+     findRecord(personId: string, boardId: string): KudoRecord;
 }
