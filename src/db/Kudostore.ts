@@ -11,13 +11,9 @@ import { KudoRecordDBGateway } from '../kudo/KudoRecordDBGateway';
 export class KudoStore implements KudoRecordDBGateway {
     
     private boards: Map<string, Board>;
-    private needSave = false;
     private localKudoStoreFile = "boards.json";
-    private saveInterval: NodeJS.Timeout;
     constructor(){
-        this.tryLoad(this.localKudoStoreFile);
-        this.startSaverClock();
-    
+        this.tryLoad(this.localKudoStoreFile);    
     }
     
     public findRecord(personId: string, boardId: string): KudoRecord {
@@ -82,30 +78,6 @@ export class KudoStore implements KudoRecordDBGateway {
             }
         }.bind(this));
     }
-
-    private startSaverClock(){
-        // save every 5 minutes? *shrug*
-        this.saveInterval = setInterval(this.save, (5*60*1000));
-    }
-
-    forceSave(){
-        this.needSave = true;
-        this.saveToFile();
-        clearInterval(this.saveInterval);
-        this.startSaverClock();
-    }
-
-    private saveToFile(){
-        if(!this.needSave){
-            return;
-        }
-         let data =JSON.stringify(Array.from(this.boards.entries()));
-        // TODO: actually make it save to a database... not as flat JSON
-        fs.writeFile(this.localKudoStoreFile, data, 'utf8', function(err, data){
-            console.log(err); 
-        }); 
-        this.needSave = false;
-    }
     
     clearBoard(boardId: string){
         this.boards.delete(boardId);
@@ -158,9 +130,6 @@ export class KudoStore implements KudoRecordDBGateway {
             const boardId = msgData.boardId
             const person = this.getPerson(acct.id, acct.name, boardId).addKudo(new Kudo(msgData.text, msgData.from, new Date(), value));
             updatedPeople.push(person);
-        }
-        if (updatedPeople.length >0){
-            this.needSave = true;
         }
         return updatedPeople;
     }

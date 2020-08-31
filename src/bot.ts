@@ -25,7 +25,7 @@ export class KudoBot extends ActivityHandler {
         this.kudoStore = kudoStore;
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
         this.onMessage(async (context, next) => { 
-            const messageData = await new UsefulMessageData(context);                
+            const messageData = new UsefulMessageData(context);                
             await messageData.getTeamName(context, kudoStore.setName.bind(kudoStore));
             let replyText= "";
             
