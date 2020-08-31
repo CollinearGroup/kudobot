@@ -37,9 +37,8 @@ export class KudoStore {
     }
 
     setName(boardId: string, teamName: string):void{
-        if (this.boards.has(boardId)){
-            this.boards.get(boardId).name = teamName;
-        }
+        let board = this.getBoard(boardId);
+            board.name = teamName;
     }
 
     private tryLoad(fileLoc: string){

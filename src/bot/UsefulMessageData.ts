@@ -17,7 +17,6 @@ export class UsefulMessageData {
         this.conversationType = context.activity.conversation.conversationType;
         this.boardId = this.getTeamId(context.activity);
         this.from = context.activity.from.id;
-        this.getTeamName(context);
     }
     async getTeamName(msgContext: TurnContext, callb: (boardId: string, teamName: string) => void = (_,_2)=>{}){
         if (this.conversationType == "channel"){
@@ -29,7 +28,7 @@ export class UsefulMessageData {
         return;
         }        
         this.teamName = "Private";
-        callb(this.boardId, this.teamName);
+             callb(this.boardId, this.teamName);
     }
 
 

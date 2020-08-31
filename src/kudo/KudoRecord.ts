@@ -1,5 +1,4 @@
 import { Kudo } from "./Kudo";
-import { Activity } from "botbuilder";
 
 export class KudoRecord{
     constructor(
