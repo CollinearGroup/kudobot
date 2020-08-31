@@ -1,6 +1,7 @@
 import { Kudo } from "./Kudo";
 
-export class KudoRecord{
+export class KudoRecord {
+
     constructor(
         public personId: string,
         public personName: string)
@@ -43,6 +44,10 @@ export class KudoRecord{
         return this.cleanOldKudos(true);
     }
 
+    exists() {
+        return true;
+    }
+
     private cleanOldKudos(forceClean:boolean = false): string{
         const daysToKeep = 30;
         const cleanFrequency = 1/(24*12); // Every 5 minutes -- In days
@@ -70,5 +75,11 @@ export class KudoRecord{
             const timeDiff = date1.getTime() - date2.getTime(); 
             const DiffInDays = timeDiff / (3600 * 24) / 1000;
             return DiffInDays;
+    }
+}
+
+export class NoopKudoRecord extends KudoRecord {
+    exists() {
+        return false;
     }
 }

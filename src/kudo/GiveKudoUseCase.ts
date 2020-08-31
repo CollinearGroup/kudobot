@@ -4,12 +4,15 @@ import { Kudo } from './Kudo';
 
 export class GiveKudoUseCase {
 
-    private kudoRecordDb: KudoRecordDBGateway;
+    constructor(private kudoRecordDb: KudoRecordDBGateway) {}
 
     public giveKudo(personTeamsId: string, teamId: string, kudos: number, text: string, giverId: string): KudoRecord {
-        const kudoRecord: KudoRecord = this.kudoRecordDb.getRecord(personTeamsId, teamId);
+        let kudoRecord: KudoRecord = this.kudoRecordDb.findRecord(personTeamsId, teamId);
+        if (!kudoRecord.exists()) {
+            kudoRecord = new KudoRecord(personTeamsId, teamId);
+        }
         kudoRecord.addKudo(new Kudo(text, giverId, new Date(), kudos));
-        this.kudoRecordDb.save(kudoRecord);
+        this.kudoRecordDb.save(teamId, kudoRecord);
         return kudoRecord;
     }
 

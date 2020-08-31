@@ -2,9 +2,10 @@ const fs = require('fs');
 
 import {Activity, ChannelAccount, TurnContext, TeamsInfo } from 'botbuilder';
 import { Board } from '../kudo/KudoBoard';
-import { KudoRecord } from '../kudo/KudoRecord';
+import { KudoRecord, NoopKudoRecord } from '../kudo/KudoRecord';
 import { Kudo } from '../kudo/Kudo';
 import { UsefulMessageData } from '../bot/UsefulMessageData'
+import { KudoRecordDBGateway } from '../kudo/KudoRecordDBGateway';
 // class for the actual Kudo given and all its related information
 
 
@@ -12,7 +13,8 @@ import { UsefulMessageData } from '../bot/UsefulMessageData'
 
 
 
-export class KudoStore {
+export class KudoStore implements KudoRecordDBGateway {
+    
     private boards: Map<string, Board>;
     private needSave = false;
     private localKudoStoreFile = "boards.json";
@@ -20,10 +22,28 @@ export class KudoStore {
     constructor(){
         this.tryLoad(this.localKudoStoreFile);
         this.startSaverClock();
+    
     }
+    
+    public findRecord(personId: string, boardId: string): KudoRecord {
+       const kudoRecord = this.boards.get(boardId)?.kudoRecords.find(record => record.personId === personId)
+       return kudoRecord || new NoopKudoRecord("", "");
+    }
+
+
+    public save(boardId: string, kudoRecord: KudoRecord) {
+        this.boards.get(boardId).kudoRecords.push(kudoRecord);
+        let data = JSON.stringify(Array.from(this.boards.entries()));
+        // TODO: actually make it save to a database... not as flat JSON
+        fs.writeFile(this.localKudoStoreFile, data, 'utf8', function (err, data) {
+            console.log(err);
+        });
+    }
+
     leaderboard(msgData:UsefulMessageData): Board{
         let board = this.getBoard(msgData.boardId);
         board.kudoRecords = this.boards.get(msgData.boardId).kudoRecords.sort((a:KudoRecord, b:KudoRecord)=>{
+ src/db/Kudostore.ts
             if (a.score > b.score){
                 return -1;
             }
@@ -76,12 +96,12 @@ export class KudoStore {
 
     forceSave(){
         this.needSave = true;
-        this.save();
+        this.saveToFile();
         clearInterval(this.saveInterval);
         this.startSaverClock();
     }
 
-    private save(){
+    private saveToFile(){
         if(!this.needSave){
             return;
         }
