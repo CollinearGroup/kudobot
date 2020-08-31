@@ -2,8 +2,9 @@ const fs = require('fs');
 
 import {Activity, ChannelAccount, TurnContext, TeamsInfo } from 'botbuilder';
 import { Board } from '../kudo/KudoBoard';
-import { KudoRecord } from '../kudo/KudoRecord';
+import { KudoRecord, NoopKudoRecord } from '../kudo/KudoRecord';
 import { Kudo } from '../kudo/Kudo';
+import { KudoRecordDBGateway } from '../kudo/KudoRecordDBGateway';
 // class for the actual Kudo given and all its related information
 
 
@@ -11,7 +12,8 @@ import { Kudo } from '../kudo/Kudo';
 
 
 
-export class KudoStore {
+export class KudoStore implements KudoRecordDBGateway {
+    
     private boards: Map<string, Board>;
     private needSave = false;
     private localKudoStoreFile = "boards.json";
@@ -19,7 +21,23 @@ export class KudoStore {
     constructor(){
         this.tryLoad(this.localKudoStoreFile);
         this.startSaverClock();
+    
     }
+    
+    public findRecord(personId: string, boardId: string): KudoRecord {
+       const kudoRecord = this.boards.get(boardId)?.kudoRecords.find(record => record.personId === personId)
+       return kudoRecord || new NoopKudoRecord("", "");
+    }
+
+    public save(boardId: string, kudoRecord: KudoRecord) {
+        this.boards.get(boardId).kudoRecords.push(kudoRecord);
+        let data = JSON.stringify(Array.from(this.boards.entries()));
+        // TODO: actually make it save to a database... not as flat JSON
+        fs.writeFile(this.localKudoStoreFile, data, 'utf8', function (err, data) {
+            console.log(err);
+        });
+    }
+
     leaderboard(msgContext:TurnContext): Board{
         const boardId = this.getTeamId(msgContext.activity);
         this.ensureBoardExists(boardId, msgContext);
@@ -72,12 +90,12 @@ export class KudoStore {
 
     forceSave(){
         this.needSave = true;
-        this.save();
+        this.saveToFile();
         clearInterval(this.saveInterval);
         this.startSaverClock();
     }
 
-    private save(){
+    private saveToFile(){
         if(!this.needSave){
             return;
         }
