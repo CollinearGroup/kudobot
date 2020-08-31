@@ -4,6 +4,7 @@ import {Activity, ChannelAccount, TurnContext, TeamsInfo } from 'botbuilder';
 import { Board } from '../kudo/KudoBoard';
 import { KudoRecord, NoopKudoRecord } from '../kudo/KudoRecord';
 import { Kudo } from '../kudo/Kudo';
+import { UsefulMessageData } from '../bot/UsefulMessageData'
 import { KudoRecordDBGateway } from '../kudo/KudoRecordDBGateway';
 // class for the actual Kudo given and all its related information
 
@@ -29,6 +30,7 @@ export class KudoStore implements KudoRecordDBGateway {
        return kudoRecord || new NoopKudoRecord("", "");
     }
 
+
     public save(boardId: string, kudoRecord: KudoRecord) {
         this.boards.get(boardId).kudoRecords.push(kudoRecord);
         let data = JSON.stringify(Array.from(this.boards.entries()));
@@ -38,11 +40,10 @@ export class KudoStore implements KudoRecordDBGateway {
         });
     }
 
-    leaderboard(msgContext:TurnContext): Board{
-        const boardId = this.getTeamId(msgContext.activity);
-        this.ensureBoardExists(boardId, msgContext);
-        let board = this.boards.get(boardId);
-        board.kudoRecords = this.boards.get(boardId).kudoRecords.sort((a:KudoRecord, b:KudoRecord)=>{
+    leaderboard(msgData:UsefulMessageData): Board{
+        let board = this.getBoard(msgData.boardId);
+        board.kudoRecords = this.boards.get(msgData.boardId).kudoRecords.sort((a:KudoRecord, b:KudoRecord)=>{
+ src/db/Kudostore.ts
             if (a.score > b.score){
                 return -1;
             }
@@ -53,6 +54,11 @@ export class KudoStore implements KudoRecordDBGateway {
             return 0;
             });
         return board;
+    }
+
+    setName(boardId: string, teamName: string):void{
+        let board = this.getBoard(boardId);
+            board.name = teamName;
     }
 
     private tryLoad(fileLoc: string){
@@ -107,26 +113,30 @@ export class KudoStore implements KudoRecordDBGateway {
         this.needSave = false;
     }
     
-    clearBoard(srcMsgContext: TurnContext){
-        const boardId = this.getTeamId(srcMsgContext.activity);
+    clearBoard(boardId: string){
         this.boards.delete(boardId);
-        this.ensureBoardExists(boardId, srcMsgContext);
     }
 
-    genDummyData(numPeople:number, msgContext:TurnContext):string{
+    getBoard(boardId: string){
+        if (!this.boards.has(boardId)){
+            this.boards.set(boardId, new Board());
+        }
+        return this.boards.get(boardId);
+    }
+
+    genDummyData(numPeople:number, msgData:UsefulMessageData):string{
         const firstNames = ["James", "Mary", "John", "Patricia", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Christopher", "Daniel", "Matthew", "Anthony", "Jennifer", "Linda", "Elizebeth", "Barbra", "Susan", "Jessica", "Sarah", "Karen"];
         const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Garcia", "Rodriguez", "Wilson", "Martinez", "Anderson", "Taylor", "Hernandez", "Moore", "Martin", "Jackson", "Thompson", "White", "Lopez", "Lee", "Gonzalez"];
         let output = ""            
         for (let i = 0; i < numPeople; i++){
             const name = `${this.takeRnd(firstNames)} ${this.takeRnd(lastNames)}`;
-            const boardId = this.getTeamId(msgContext.activity);
-            this.ensureBoardExists(boardId, msgContext);
-            const person = this.getPerson(`dummy_${this.getRnd(5000,5000000)}`, name, boardId);
+            this.getBoard(msgData.boardId);
+            const person = this.getPerson(`dummy_${this.getRnd(5000,5000000)}`, name, msgData.boardId);
             const kudosToMake = this.getRnd(0,42);
             for (let k = 0; k < kudosToMake; k++){
                 let oldDate = new Date();
                 oldDate.setDate(oldDate.getDay()-this.getRnd(0,60));
-                person.addKudo(new Kudo(msgContext.activity.text, msgContext.activity.from.id, oldDate, ));
+                person.addKudo(new Kudo(msgData.text, msgData.from, oldDate, ));
             }
             output += `${kudosToMake} Kudos created for ${name}. <br>`;                
             output += person.forceCleanOldKudos();
@@ -148,42 +158,17 @@ export class KudoStore implements KudoRecordDBGateway {
     }
     
     // little wrapper for addKudo so you can handle multiple people receiving a kudo from one message 
-    giveKudos(accts:Array<ChannelAccount>, msgContext:TurnContext, value:number = 1): Array<KudoRecord>{
+    giveKudos(accts:Array<ChannelAccount>, msgData:UsefulMessageData, value:number = 1): Array<KudoRecord>{
         let updatedPeople: Array<KudoRecord> = [];
         for (const acct of accts){
-            const boardId = this.getTeamId(msgContext.activity);
-            this.ensureBoardExists(boardId, msgContext);
-            const person = this.getPerson(acct.id, acct.name, boardId).addKudo(new Kudo(msgContext.activity.text, msgContext.activity.from.id, new Date(), value));
+            const boardId = msgData.boardId
+            const person = this.getPerson(acct.id, acct.name, boardId).addKudo(new Kudo(msgData.text, msgData.from, new Date(), value));
             updatedPeople.push(person);
         }
         if (updatedPeople.length >0){
             this.needSave = true;
         }
         return updatedPeople;
-    }
-
-    private ensureBoardExists(boardId: string, msgContext: TurnContext){
-        if (!this.boards.has(boardId)){
-            const teamDetails = TeamsInfo.getTeamDetails(msgContext);
-            let newBoard = new Board();
-            teamDetails.then((data)=>{
-                newBoard.name = data.name;
-            })
-            this.boards.set(boardId, newBoard);
-        }
-    }
-
-    private getTeamId(activity: Activity):string{
-        let teamId = activity.channelData;
-        if (activity.conversation.conversationType == "personal"){
-            // really this shouldn't happen since you cant @ anyone to add kudos but for testing its helpful to be able to
-            teamId = teamId.tenant.id;
-        }        
-        if (activity.conversation.conversationType == "channel"){
-            teamId = teamId.team.id.split(":")[1].split("@")[0];
-        }
-        return teamId;  
-        
     }
 
     // if people gets too big -- search time might suck 
