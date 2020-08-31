@@ -8,11 +8,6 @@ import { UsefulMessageData } from '../bot/UsefulMessageData'
 import { KudoRecordDBGateway } from '../kudo/KudoRecordDBGateway';
 // class for the actual Kudo given and all its related information
 
-
-
-
-
-
 export class KudoStore implements KudoRecordDBGateway {
     
     private boards: Map<string, Board>;
@@ -43,7 +38,6 @@ export class KudoStore implements KudoRecordDBGateway {
     leaderboard(msgData:UsefulMessageData): Board{
         let board = this.getBoard(msgData.boardId);
         board.kudoRecords = this.boards.get(msgData.boardId).kudoRecords.sort((a:KudoRecord, b:KudoRecord)=>{
- src/db/Kudostore.ts
             if (a.score > b.score){
                 return -1;
             }
