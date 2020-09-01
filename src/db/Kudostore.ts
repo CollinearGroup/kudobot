@@ -18,17 +18,21 @@ export class KudoStore implements KudoRecordDBGateway {
     
     public findRecord(personId: string, boardId: string): KudoRecord {
        const kudoRecord = this.boards.get(boardId)?.kudoRecords.find(record => record.personId === personId)
-       return kudoRecord || new NoopKudoRecord("", "");
+       return kudoRecord || new NoopKudoRecord("", "", "");
     }
 
 
-    public save(boardId: string, kudoRecord: KudoRecord) {
-        this.boards.get(boardId).kudoRecords.push(kudoRecord);
+    public save(kudoRecord: KudoRecord) {
+        this.boards.get(kudoRecord.teamId).kudoRecords.push(kudoRecord);
         let data = JSON.stringify(Array.from(this.boards.entries()));
         // TODO: actually make it save to a database... not as flat JSON
         fs.writeFile(this.localKudoStoreFile, data, 'utf8', function (err, data) {
             console.log(err);
         });
+    }
+
+    getAllRecords(teamId: string): Array<KudoRecord>{
+        throw new Error("not Implemented")
     }
 
     leaderboard(msgData:UsefulMessageData): Board{
@@ -64,7 +68,7 @@ export class KudoStore implements KudoRecordDBGateway {
                     // Not actualy an official board object but its close enough
                     if (board.kudoRecords){
                         for (const record of board.kudoRecords){
-                            let newRecord = new KudoRecord(record.personName, record.personName);
+                            let newRecord = new KudoRecord(record.personName, record.personName, record.teamId);
                             newRecord.importKudos(record.kudos);
                             newRecords.push(newRecord);
                         }
@@ -135,15 +139,15 @@ export class KudoStore implements KudoRecordDBGateway {
     }
 
     // if people gets too big -- search time might suck 
-    private getPerson(id:string, name:string, boardId:string){
-        for(const person of this.boards.get(boardId).kudoRecords){
+    private getPerson(id:string, name:string, teamId:string){
+        for(const person of this.boards.get(teamId).kudoRecords){
             if (person.personId == id){
                 return person;
             }
         }
         // No person by that name was found. 
-        const newPerson = new KudoRecord(id, name);
-        this.boards.get(boardId).kudoRecords.push(newPerson);
+        const newPerson = new KudoRecord(id, name, teamId);
+        this.boards.get(teamId).kudoRecords.push(newPerson);
         return newPerson; 
     }
 

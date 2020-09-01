@@ -4,7 +4,8 @@ export class KudoRecord {
 
     constructor(
         public personId: string,
-        public personName: string)
+        public personName: string,
+        public teamId: string)
     {
         this.lastKudoCleanup = new Date(0);
     }
