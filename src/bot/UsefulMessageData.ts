@@ -1,5 +1,6 @@
 import { TurnContext, ChannelAccount, Activity, TeamsInfo} from 'botbuilder';
 import {getMentions, getAtCmds} from '../util/TextParseUtils';
+import { getTeamId } from '../util/teamsUtils';
 
 export class UsefulMessageData {
     text: string;
@@ -15,7 +16,7 @@ export class UsefulMessageData {
         this.uniqueMentions = getMentions(context.activity.entities);
         this.containedAtCmds = getAtCmds(context.activity.text);
         this.conversationType = context.activity.conversation.conversationType;
-        this.boardId = this.getTeamId(context.activity);
+        this.boardId = getTeamId(context);
         this.from = context.activity.from.id;
     }
     async getTeamName(msgContext: TurnContext, callb: (boardId: string, teamName: string) => void = (_,_2)=>{}){
@@ -29,18 +30,5 @@ export class UsefulMessageData {
         }        
         this.teamName = "Private";
              callb(this.boardId, this.teamName);
-    }
-
-
-    private getTeamId(channelData: Activity):string{
-        let teamId;
-        if (this.conversationType == "personal"){
-            // really this shouldn't happen since you cant @ anyone to add kudos but for testing its helpful to be able to
-            teamId = channelData.channelData.tenant.id;
-        }        
-        if (this.conversationType == "channel"){
-            teamId = channelData.channelData.team.id.split(":")[1].split("@")[0];
-        }
-        return teamId;         
     }
 }
