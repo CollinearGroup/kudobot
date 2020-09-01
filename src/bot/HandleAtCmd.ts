@@ -43,11 +43,6 @@ export class HandleAtCmdUseCase {
                     this.kudoStore.clearBoard(this.msgData.boardId);
                     outputText += `Leaderboard cleared. I hope you meant to do that...`;
                     break;
-                case "save":
-                case "@save":
-                    this.kudoStore.forceSave();
-                    outputText += `Saved.`;
-                    break;
                 case "help":
                     const command: string = getStuffAfter("@help", this.msgData.text)[0];
                     outputText += getHelpText(command.replace("@", ""))

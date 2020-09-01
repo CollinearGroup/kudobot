@@ -8,31 +8,22 @@ import { UsefulMessageData } from '../bot/UsefulMessageData'
 import { KudoRecordDBGateway } from '../kudo/KudoRecordDBGateway';
 // class for the actual Kudo given and all its related information
 
-
-
-
-
-
 export class KudoStore implements KudoRecordDBGateway {
     
     private boards: Map<string, Board>;
-    private needSave = false;
     private localKudoStoreFile = "boards.json";
-    private saveInterval: NodeJS.Timeout;
     constructor(){
-        this.tryLoad(this.localKudoStoreFile);
-        this.startSaverClock();
-    
+        this.tryLoad(this.localKudoStoreFile);    
     }
     
     public findRecord(personId: string, boardId: string): KudoRecord {
        const kudoRecord = this.boards.get(boardId)?.kudoRecords.find(record => record.personId === personId)
-       return kudoRecord || new NoopKudoRecord("", "");
+       return kudoRecord || new NoopKudoRecord("", "", "");
     }
 
 
-    public save(boardId: string, kudoRecord: KudoRecord) {
-        this.boards.get(boardId).kudoRecords.push(kudoRecord);
+    public save(kudoRecord: KudoRecord) {
+        this.boards.get(kudoRecord.teamId).kudoRecords.push(kudoRecord);
         let data = JSON.stringify(Array.from(this.boards.entries()));
         // TODO: actually make it save to a database... not as flat JSON
         fs.writeFile(this.localKudoStoreFile, data, 'utf8', function (err, data) {
@@ -40,10 +31,13 @@ export class KudoStore implements KudoRecordDBGateway {
         });
     }
 
+    getAllRecords(teamId: string): Array<KudoRecord>{
+        throw new Error("not Implemented")
+    }
+
     leaderboard(msgData:UsefulMessageData): Board{
         let board = this.getBoard(msgData.boardId);
         board.kudoRecords = this.boards.get(msgData.boardId).kudoRecords.sort((a:KudoRecord, b:KudoRecord)=>{
- src/db/Kudostore.ts
             if (a.score > b.score){
                 return -1;
             }
@@ -74,7 +68,7 @@ export class KudoStore implements KudoRecordDBGateway {
                     // Not actualy an official board object but its close enough
                     if (board.kudoRecords){
                         for (const record of board.kudoRecords){
-                            let newRecord = new KudoRecord(record.personName, record.personName);
+                            let newRecord = new KudoRecord(record.personName, record.personName, record.teamId);
                             newRecord.importKudos(record.kudos);
                             newRecords.push(newRecord);
                         }
@@ -87,30 +81,6 @@ export class KudoStore implements KudoRecordDBGateway {
                 }
             }
         }.bind(this));
-    }
-
-    private startSaverClock(){
-        // save every 5 minutes? *shrug*
-        this.saveInterval = setInterval(this.save, (5*60*1000));
-    }
-
-    forceSave(){
-        this.needSave = true;
-        this.saveToFile();
-        clearInterval(this.saveInterval);
-        this.startSaverClock();
-    }
-
-    private saveToFile(){
-        if(!this.needSave){
-            return;
-        }
-         let data =JSON.stringify(Array.from(this.boards.entries()));
-        // TODO: actually make it save to a database... not as flat JSON
-        fs.writeFile(this.localKudoStoreFile, data, 'utf8', function(err, data){
-            console.log(err); 
-        }); 
-        this.needSave = false;
     }
     
     clearBoard(boardId: string){
@@ -165,22 +135,19 @@ export class KudoStore implements KudoRecordDBGateway {
             const person = this.getPerson(acct.id, acct.name, boardId).addKudo(new Kudo(msgData.text, msgData.from, new Date(), value));
             updatedPeople.push(person);
         }
-        if (updatedPeople.length >0){
-            this.needSave = true;
-        }
         return updatedPeople;
     }
 
     // if people gets too big -- search time might suck 
-    private getPerson(id:string, name:string, boardId:string){
-        for(const person of this.boards.get(boardId).kudoRecords){
+    private getPerson(id:string, name:string, teamId:string){
+        for(const person of this.boards.get(teamId).kudoRecords){
             if (person.personId == id){
                 return person;
             }
         }
         // No person by that name was found. 
-        const newPerson = new KudoRecord(id, name);
-        this.boards.get(boardId).kudoRecords.push(newPerson);
+        const newPerson = new KudoRecord(id, name, teamId);
+        this.boards.get(teamId).kudoRecords.push(newPerson);
         return newPerson; 
     }
 
