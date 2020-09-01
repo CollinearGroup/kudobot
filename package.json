@@ -11,7 +11,7 @@
         "postinstall": "npm run build && node ./deploymentScripts/webConfigPrep.js",
         "start": "tsc --build && node ./lib/index.js",
         "test": "jest",
-        "test-watch": "jest --watch",
+        "test-watch": "jest --watchAll",
         "watch": "nodemon --watch ./src -e ts --exec \"npm run start\""
     },
     "repository": {
