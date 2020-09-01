@@ -2,6 +2,8 @@ import { FakeKudoDbGateway }  from '../../testHelpers/fakeDBGateway'
 import { KudoRecord } from '../../src/kudo/KudoRecord';
 import { Kudo } from '../../src/kudo/Kudo';
 import { GetLeaderboardUseCase } from '../../src/kudo/GetLeaderboardUseCase'
+import { FakeTeamsGateway } from '../../testHelpers/fakeTeamsGateway';
+import { TurnContext, TestAdapter } from 'botbuilder';
 
 
 test("Should return leaderboard in desc order", () => {
@@ -22,8 +24,11 @@ test("Should return leaderboard in desc order", () => {
     kudoRecord.addKudo(new Kudo("Great job again!", "3", new Date, 1));
     fakeDBGateway.save(kudoRecord);
 
-    const getLeaderboardUseCase = new GetLeaderboardUseCase(fakeDBGateway);
+    const getLeaderboardUseCase = new GetLeaderboardUseCase(fakeDBGateway, new FakeTeamsGateway("3"));
 
-    const response = getLeaderboardUseCase.getLeaderboard("3");
-    expect(response).toBe(`Carlos has 3 points.\nMiguel has 2 points.\nJeff has 1 point.`)
+    const adapter = new TestAdapter(async (context) => {
+        const response = await getLeaderboardUseCase.getLeaderboard(context);
+        expect(response).toBe(`Team Delta\nCarlos has 3 points.\nMiguel has 2 points.\nJeff has 1 point.`)
+   });
+   adapter.send("leaderboard");
 })
