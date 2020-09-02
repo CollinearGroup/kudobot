@@ -10,7 +10,7 @@
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "postinstall": "npm run build && node ./deploymentScripts/webConfigPrep.js",
         "start": "tsc --build && node ./lib/index.js",
-        "test": "jest",
+        "test": "jest --collect-coverage",
         "test-watch": "jest --watch",
         "watch": "nodemon --watch ./src -e ts --exec \"npm run start\""
     },

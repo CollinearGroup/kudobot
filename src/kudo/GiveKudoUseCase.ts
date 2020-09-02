@@ -1,19 +1,25 @@
 import { KudoRecord } from './KudoRecord';
 import { KudoRecordDBGateway } from './KudoRecordDBGateway';
-import { Kudo } from './Kudo';
 
 export class GiveKudoUseCase {
+    
 
     constructor(private kudoRecordDb: KudoRecordDBGateway) {}
 
-    public giveKudo(personTeamsId: string, personName: string, teamId: string, kudos: number, text: string, giverId: string): KudoRecord {
-        let kudoRecord: KudoRecord = this.kudoRecordDb.findRecord(personTeamsId, teamId);
-        if (!kudoRecord.exists()) {
-            kudoRecord = new KudoRecord(personTeamsId, personName, teamId);
+    public giveKudo(personTeamsId: string, personName: string, teamId: string): string {
+        let record: KudoRecord = this.kudoRecordDb.findRecord(personTeamsId, teamId);
+        if (!record.exists()) {
+            record = new KudoRecord(personTeamsId, personName, teamId, 0);
         }
-        kudoRecord.addKudo(new Kudo(text, giverId, new Date(), kudos));
-        this.kudoRecordDb.save(kudoRecord);
-        return kudoRecord;
+        record.kudos++;
+        this.kudoRecordDb.save(record);
+
+        return `${record.personName} has *${record.kudos}* point${record.kudos > 1 ? 's' : ''}. ${this.getRandomdEncouragement()}`
+    }
+
+    private getRandomdEncouragement() {
+        const items = ["Great Job!", "You're crushing it!", "Well done.", "Wow!", "Excellent!"]
+        return items[Math.floor(Math.random() * items.length)];
     }
 
 }

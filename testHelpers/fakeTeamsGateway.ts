@@ -9,10 +9,9 @@ export class FakeTeamsGateway implements TeamsGateway {
     return new Promise(resolve => {
       resolve({
         id: this.teamId,
-        name: "Team Delta"
+        name: "Team Fake"
       }
       )
     })
   }
-
 }
