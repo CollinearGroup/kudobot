@@ -1,11 +1,33 @@
 import { KudoRecordDBGateway } from "./KudoRecordDBGateway";
-export class GetLeaderboardUseCase
-{
-    constructor (private kudoRecordDBGateway: KudoRecordDBGateway){}
-    
-    getLeaderboard(teamId:string){
-        const allRecords = this.kudoRecordDBGateway.getAllRecords(teamId);
-        const sortedAllRecords = allRecords.sort((a, b)=> a.score>b.score ? -1:1);//desc
-        return sortedAllRecords.map(record=>`${record.personName} has ${record.score} point${record.score>1?'s':''}.`).join(`\n`);       
-    }
+import { TeamsGateway } from "./TeamsGateway";
+import { TurnContext } from "botbuilder";
+import { KudoRecord } from "./KudoRecord";
+
+export class GetLeaderboardUseCase {
+  constructor(
+    private kudoRecordDBGateway: KudoRecordDBGateway,
+    private teamsGateway: TeamsGateway
+  ) {}
+
+  async get(msgContext: TurnContext) {
+    const {
+      id: teamId,
+      name: teamName,
+    } = await this.teamsGateway.getTeamDetails(msgContext);
+    const allRecords = this.kudoRecordDBGateway.getAllRecords(teamId);
+    const sortedAllRecords = allRecords.sort((a, b) =>
+      a.kudos > b.kudos ? -1 : 1
+    );
+
+    const leaderBoard = sortedAllRecords
+      .map((record, index) => this.recordToRow(record, index + 1))
+      .join("\n");
+    return `**${teamName}**\n\n${leaderBoard}`;
+  }
+
+  private recordToRow(record: KudoRecord, row: number) {
+    return `${row}. ${record.personName} has *${record.kudos}* point${
+      record.kudos > 1 ? "s" : ""
+    }.`;
+  }
 }

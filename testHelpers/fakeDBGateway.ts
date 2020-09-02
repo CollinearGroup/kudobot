@@ -6,10 +6,11 @@ export class FakeKudoDbGateway implements KudoRecordDBGateway {
   save(kudoRecord: KudoRecord): void {
     this.kudoRecords.push(kudoRecord);
   }
-  findRecord(personId: string, boardId: string): KudoRecord {
+
+  findRecord(personId: string, teamId: string): KudoRecord {
     return (
       this.kudoRecords.find((kudo) => kudo.personId === personId) ||
-      new NoopKudoRecord("", "", "")
+      new NoopKudoRecord()
     );
   }
   getAllRecords(teamId: string) {

@@ -11,9 +11,16 @@ import * as restify from "restify";
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
+
 import { BotFrameworkAdapter } from "botbuilder";
-import { KudoBot } from "./bot";
-import { KudoStore } from "./db/Kudostore";
+
+// This bot's main dialog.
+import { KudoBot } from "./bot/KudoBot";
+import { GetLeaderboardUseCase } from "./kudo/GetLeaderboardUseCase";
+import { TeamsGatewayImpl } from "./teams/TeamsGatewayImpl";
+import { GiveKudoUseCase } from "./kudo/GiveKudoUseCase";
+import { KudoRecordFileDbGateway } from "./db/KudoRecordFileDbGateway";
+import { GetHelpUseCase } from "./bot/GetHelpTextUseCase";
 
 // Create HTTP server.
 const server = restify.createServer();
@@ -57,14 +64,27 @@ const onTurnErrorHandler = async (context, error) => {
 // Set the onTurnError for the singleton BotFrameworkAdapter.
 adapter.onTurnError = onTurnErrorHandler;
 
-// Create the main dialog.
-const myBot = new KudoBot(new KudoStore());
+// Bot initialization
+const kudoFileDbGateway = new KudoRecordFileDbGateway();
+const teamsGateway = new TeamsGatewayImpl();
+const getLeaderboardUseCase = new GetLeaderboardUseCase(
+  kudoFileDbGateway,
+  teamsGateway
+);
+const giveKudoUseCase = new GiveKudoUseCase(kudoFileDbGateway);
+const getHelpUseCase = new GetHelpUseCase();
+const kudoBot = new KudoBot(
+  getLeaderboardUseCase,
+  giveKudoUseCase,
+  getHelpUseCase
+);
 
 // Listen for incoming requests.
+
 server.post("/api/messages", (req, res) => {
   adapter.processActivity(req, res, async (context) => {
     // Route to main dialog.
-    await myBot.run(context);
+    await kudoBot.run(context);
   });
 });
 
@@ -82,6 +102,6 @@ server.on("upgrade", (req, socket, head) => {
   streamingAdapter.useWebSocket(req, socket, head, async (context) => {
     // After connecting via WebSocket, run this logic for every request sent over
     // the WebSocket connection.
-    await myBot.run(context);
+    await kudoBot.run(context);
   });
 });
