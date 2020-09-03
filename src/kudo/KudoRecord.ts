@@ -9,6 +9,10 @@ export class KudoRecord {
   exists() {
     return true;
   }
+
+  equals(other: KudoRecord): boolean {
+    return this.personId === other.personId && this.teamId === other.teamId;
+  }
 }
 
 export class NoopKudoRecord extends KudoRecord {

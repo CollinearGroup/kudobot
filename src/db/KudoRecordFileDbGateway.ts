@@ -4,11 +4,13 @@ import * as fs from "fs";
 
 export class KudoRecordFileDbGateway implements KudoRecordDBGateway {
   private kudoRecords: KudoRecord[];
-  private localKudoStoreFile = "boards.json";
 
-  constructor() {
-    if(!fs.existsSync(this.localKudoStoreFile)) {
-      fs.writeFileSync(this.localKudoStoreFile, JSON.stringify(new Array<KudoRecord>()));
+  constructor(private localKudoStoreFile = "boards.json") {
+    if (!fs.existsSync(this.localKudoStoreFile)) {
+      fs.writeFileSync(
+        this.localKudoStoreFile,
+        JSON.stringify(new Array<KudoRecord>())
+      );
       this.kudoRecords = [];
       return;
     }
@@ -35,6 +37,11 @@ export class KudoRecordFileDbGateway implements KudoRecordDBGateway {
   }
 
   public save(kudoRecord: KudoRecord) {
+    if (this.findRecord(kudoRecord.personId, kudoRecord.teamId).exists()) {
+      this.kudoRecords = this.kudoRecords.filter(
+        (each) => !each.equals(kudoRecord)
+      );
+    }
     this.kudoRecords.push(kudoRecord);
     fs.writeFileSync(this.localKudoStoreFile, JSON.stringify(this.kudoRecords));
   }
