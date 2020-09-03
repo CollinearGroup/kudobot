@@ -11,7 +11,8 @@
     "start": "tsc --build && node ./lib/index.js",
     "test": "jest --collect-coverage",
     "test-watch": "jest --watchAll",
-    "watch": "nodemon --watch ./src -e ts --exec \"npm run start\""
+    "watch": "nodemon --watch ./src -e ts --exec \"npm run start\"",
+    "make-badges": "istanbul-badges-readme"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "@types/jest": "^26.0.10",
     "@types/restify": "8.4.2",
     "husky": "^4.2.5",
+    "istanbul-badges-readme": "^1.0.5",
     "jest": "^26.4.2",
     "nodemon": "~2.0.4",
     "prettier": "2.1.1",
@@ -38,7 +40,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "pretty-quick --staged && npm test && istanbul-badges-readme && git add 'README.md'"
     }
   }
 }

@@ -1,50 +1,56 @@
-# echo-bot
+# KudoBot
 
 Bot Builder v4 echo bot sample
 
 This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to create a simple bot that accepts input from the user and echoes it back.
+
+## Test Coverage
+
+| Statements                                                            | Branches                                                            | Functions                                                            | Lines                                                            |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![Statements](https://img.shields.io/badge/Coverage-61.49%25-red.svg) | ![Branches](https://img.shields.io/badge/Coverage-61.11%25-red.svg) | ![Functions](https://img.shields.io/badge/Coverage-57.78%25-red.svg) | ![Lines](https://img.shields.io/badge/Coverage-62.75%25-red.svg) |
 
 ## Running this code
 
     ngrok http -host-header=rewrite 3978
     copy the https URL and add /api/messages to the end of it
     paste that into azure Messaging endpoint box under your bot's settings page and save your changes
-    dont forget to start your bot. ngrok is not your app, just a tunnel. 
+    dont forget to start your bot. ngrok is not your app, just a tunnel.
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org) version 10.14.1 or higher
 
-    ```bash
-    # determine node version
-    node --version
-    ```
+  ```bash
+  # determine node version
+  node --version
+  ```
 
 ## To try this sample
 
 - Clone the repository
 
-    ```bash
-    git clone https://github.com/microsoft/botbuilder-samples.git
-    ```
+  ```bash
+  git clone https://github.com/microsoft/botbuilder-samples.git
+  ```
 
 - In a console, navigate to `samples/typescript_nodejs/02.echo-bot`
 
-    ```bash
-    cd samples/typescript_nodejs/02.echo-bot
-    ```
+  ```bash
+  cd samples/typescript_nodejs/02.echo-bot
+  ```
 
 - Install modules
 
-    ```bash
-    npm install
-    ```
+  ```bash
+  npm install
+  ```
 
 - Start the bot
 
-    ```bash
-    npm start
-    ```
+  ```bash
+  npm start
+  ```
 
 ## Testing the bot using Bot Framework Emulator
 
