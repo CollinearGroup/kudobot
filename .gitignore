@@ -3,3 +3,4 @@ boards.json
 lib
 .env
 coverage
+.idea/

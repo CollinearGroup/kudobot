@@ -1,29 +1,44 @@
 import { FakeKudoDbGateway } from "../testHelpers/fakeDBGateway";
 import { FakeTeamsGateway } from "../testHelpers/fakeTeamsGateway";
-import { GetLeaderboardUseCase } from "../src/kudo/GetLeaderboardUseCase";
-import { GiveKudoUseCase } from "../src/kudo/GiveKudoUseCase";
-import { GetHelpUseCase } from "../src/bot/GetHelpTextUseCase";
-import { KudoBot } from "../src/bot/KudoBot";
 import { TestAdapter } from "botbuilder";
+import { createBot } from "../src/bot/BotConfiguration";
+import { KudoRecord } from "../src/kudo/KudoRecord";
 
-const kudoFileDbGateway = new FakeKudoDbGateway();
+const fakeKudoDbGateway = new FakeKudoDbGateway();
 const teamsGateway = new FakeTeamsGateway("FAKE_TEAM_ID");
-const getLeaderboardUseCase = new GetLeaderboardUseCase(
-  kudoFileDbGateway,
-  teamsGateway
-);
-const giveKudoUseCase = new GiveKudoUseCase(kudoFileDbGateway);
-const getHelpUseCase = new GetHelpUseCase();
-const bot = new KudoBot(getLeaderboardUseCase, giveKudoUseCase, getHelpUseCase);
+const bot = createBot(fakeKudoDbGateway, teamsGateway);
 
 const testAdapter = new TestAdapter(async (context) => bot.run(context));
 
-test("When sending @leaderboard message to bot get help text", async () => {
-  giveKudoUseCase.giveKudo("1", "Test User 1", "FAKE_TEAM_ID");
-  giveKudoUseCase.giveKudo("1", "Test User 1", "FAKE_TEAM_ID");
-  giveKudoUseCase.giveKudo("2", "Test User 2", "FAKE_TEAM_ID");
-  testAdapter.test(
+beforeAll(() => {
+  process.env.BOT_NAME = "KudoBot";
+});
+
+test("When sending @leaderboard get leaderboard output", async () => {
+  const points = [5, 4, 1];
+  fakeKudoDbGateway.save(
+    new KudoRecord("1", "Test User 1", "FAKE_TEAM_ID", points[0])
+  );
+  fakeKudoDbGateway.save(
+    new KudoRecord("2", "Test User 2", "FAKE_TEAM_ID", points[1])
+  );
+  fakeKudoDbGateway.save(
+    new KudoRecord("3", "Test User 3", "FAKE_TEAM_ID", points[2])
+  );
+  await testAdapter.test(
     "@leaderboard",
-    "**Team Fake**\n\n1. Test User 1 has *2* points.\n2. Test User 1 has *2* points.\n3. Test User 2 has *1* point."
+    `**Team Fake**\n\n1. Test User 1 has *${points[0]}* points.\n2. Test User 2 has *${points[1]}* points.\n3. Test User 3 has *${points[2]}* point.`
+  );
+});
+test("When sending @help @leaderboard get help text about that command", async () => {
+  await testAdapter.test(
+    "@help @leaderboard",
+    `"@KudoBot @leaderboard" will output the current leaderboard`
+  );
+});
+test("When sending message without matching command return default reply", async () => {
+  await testAdapter.test(
+    "What's up",
+    `Something I can do for you User1?<br>Try @KudoBot @help for a list of things I can do!`
   );
 });

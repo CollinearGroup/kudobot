@@ -21,10 +21,10 @@ export class GiveKudoUseCase {
 
     return `${record.personName} has *${record.kudos}* point${
       record.kudos > 1 ? "s" : ""
-    }. ${this.getRandomdEncouragement()}`;
+    }. ${this.getRandomEncouragement()}`;
   }
 
-  private getRandomdEncouragement() {
+  private getRandomEncouragement() {
     const items = [
       "Great Job!",
       "You're crushing it!",

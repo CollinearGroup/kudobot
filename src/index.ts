@@ -21,6 +21,7 @@ import { TeamsGatewayImpl } from "./teams/TeamsGatewayImpl";
 import { GiveKudoUseCase } from "./kudo/GiveKudoUseCase";
 import { KudoRecordFileDbGateway } from "./db/KudoRecordFileDbGateway";
 import { GetHelpUseCase } from "./bot/GetHelpTextUseCase";
+import { createBot } from "./bot/BotConfiguration";
 
 // Create HTTP server.
 const server = restify.createServer();
@@ -67,17 +68,7 @@ adapter.onTurnError = onTurnErrorHandler;
 // Bot initialization
 const kudoFileDbGateway = new KudoRecordFileDbGateway();
 const teamsGateway = new TeamsGatewayImpl();
-const getLeaderboardUseCase = new GetLeaderboardUseCase(
-  kudoFileDbGateway,
-  teamsGateway
-);
-const giveKudoUseCase = new GiveKudoUseCase(kudoFileDbGateway);
-const getHelpUseCase = new GetHelpUseCase();
-const kudoBot = new KudoBot(
-  getLeaderboardUseCase,
-  giveKudoUseCase,
-  getHelpUseCase
-);
+const kudoBot = createBot(kudoFileDbGateway, teamsGateway);
 
 // Listen for incoming requests.
 
