@@ -7,6 +7,12 @@ export class KudoRecordFileDbGateway implements KudoRecordDBGateway {
   private localKudoStoreFile = "boards.json";
 
   constructor() {
+    if(!fs.existsSync(this.localKudoStoreFile)) {
+      fs.writeFileSync(this.localKudoStoreFile, JSON.stringify(new Array<KudoRecord>()));
+      this.kudoRecords = [];
+      return;
+    }
+
     const parsedObjects = JSON.parse(
       fs.readFileSync(this.localKudoStoreFile).toString()
     );
