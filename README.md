@@ -8,7 +8,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com), i
 
 | Statements                                                            | Branches                                                            | Functions                                                            | Lines                                                            |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| ![Statements](https://img.shields.io/badge/Coverage-61.49%25-red.svg) | ![Branches](https://img.shields.io/badge/Coverage-61.11%25-red.svg) | ![Functions](https://img.shields.io/badge/Coverage-57.78%25-red.svg) | ![Lines](https://img.shields.io/badge/Coverage-62.75%25-red.svg) |
+| ![Statements](https://img.shields.io/badge/Coverage-69.23%25-red.svg) | ![Branches](https://img.shields.io/badge/Coverage-72.09%25-red.svg) | ![Functions](https://img.shields.io/badge/Coverage-72.34%25-red.svg) | ![Lines](https://img.shields.io/badge/Coverage-70.19%25-red.svg) |
 
 ## Running this code
 

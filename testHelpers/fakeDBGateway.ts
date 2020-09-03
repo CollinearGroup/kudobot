@@ -4,6 +4,11 @@ export class FakeKudoDbGateway implements KudoRecordDBGateway {
   private kudoRecords: KudoRecord[] = [];
 
   save(kudoRecord: KudoRecord): void {
+    if (this.findRecord(kudoRecord.personId, kudoRecord.teamId).exists()) {
+      this.kudoRecords = this.kudoRecords.filter(
+        (each) => !each.equals(kudoRecord)
+      );
+    }
     this.kudoRecords.push(kudoRecord);
   }
 
