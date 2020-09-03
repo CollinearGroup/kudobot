@@ -2,25 +2,31 @@ import { FakeKudoDbGateway } from "../../testHelpers/fakeDBGateway";
 import { KudoRecord } from "../../src/kudo/KudoRecord";
 import { GetLeaderboardUseCase } from "../../src/kudo/GetLeaderboardUseCase";
 import { FakeTeamsGateway } from "../../testHelpers/fakeTeamsGateway";
-import { TestAdapter } from "botbuilder";
+import { TeamsInfo, TestAdapter, TurnContext, TeamDetails } from "botbuilder";
+import { TeamsGatewayImpl } from "../../src/teams/TeamsGatewayImpl";
 
 let getLeaderboardUseCase = null;
+const TEAM_ID = "FAKE_TEAM_ID";
+
+beforeAll(() => {
+  TeamsInfo.getTeamDetails = (context) =>
+    new FakeTeamsGateway(TEAM_ID).getTeamDetails(context);
+});
 
 beforeEach(() => {
   const fakeDBGateway = new FakeKudoDbGateway();
-  fakeDBGateway.save(new KudoRecord("1", "Carlos", "3", 3));
-  fakeDBGateway.save(new KudoRecord("1", "Carlos", "3", 4));
-  fakeDBGateway.save(new KudoRecord("1", "Carlos", "3", 5));
+  fakeDBGateway.save(new KudoRecord("1", "Carlos", TEAM_ID, 3));
+  fakeDBGateway.save(new KudoRecord("1", "Carlos", TEAM_ID, 4));
+  fakeDBGateway.save(new KudoRecord("1", "Carlos", TEAM_ID, 5));
 
-  fakeDBGateway.save(new KudoRecord("3", "Jeff", "3", 1));
-  fakeDBGateway.save(new KudoRecord("2", "Miguel", "3", 2));
+  fakeDBGateway.save(new KudoRecord("3", "Jeff", TEAM_ID, 1));
+  fakeDBGateway.save(new KudoRecord("2", "Miguel", TEAM_ID, 2));
 
   getLeaderboardUseCase = new GetLeaderboardUseCase(
     fakeDBGateway,
-    new FakeTeamsGateway("3")
+    new TeamsGatewayImpl()
   );
 });
-
 test("Should return leaderboard in desc order", async () => {
   const adapter = new TestAdapter(async (context) => {
     const response = await getLeaderboardUseCase.get(context);
