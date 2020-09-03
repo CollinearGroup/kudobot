@@ -3,7 +3,6 @@ import {
   MessageFactory,
   TurnContext,
   TeamsInfo,
-  Activity,
 } from "botbuilder";
 import { GetLeaderboardUseCase } from "../kudo/GetLeaderboardUseCase";
 import { GiveKudoUseCase } from "../kudo/GiveKudoUseCase";
@@ -31,9 +30,6 @@ export class KudoBot extends ActivityHandler {
         case GIVE_KUDO:
           await this.handleGiveKudo(context);
           break;
-        case "@clearboard":
-          await this.sendReply(`Not yet implemented`, context);
-          break;
         default:
           await this.handleDefault(context);
           break;
@@ -44,11 +40,11 @@ export class KudoBot extends ActivityHandler {
   }
 
   private async handleDefault(context: TurnContext) {
-    const botName = process.env.BOT_NAME;
+    const botName = process.env.BOT_NAME || "KudoBot";
     let replyText = `Something I can do for you ${
       context.activity.from.name.split(" ")[0]
     }?<br>`;
-    replyText += `Try @${botName} @commands for a list of things I can do!`;
+    replyText += `Try @${botName} @help for a list of things I can do!`;
     await this.sendReply(replyText, context);
   }
 
@@ -91,8 +87,9 @@ export class KudoBot extends ActivityHandler {
       if (activity.text.includes(incrementedName)) return GIVE_KUDO;
     }
 
-    if (activity.text.includes(LEADERBOARD)) return LEADERBOARD;
-    if (activity.text.includes(HELP)) return HELP;
+    let firstCommand = getAtCommands(activity.text)[0];
+    if (LEADERBOARD === firstCommand) return LEADERBOARD;
+    if (HELP === firstCommand) return HELP;
 
     return "UNKNOWN";
   }
