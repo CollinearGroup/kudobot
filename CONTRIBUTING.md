@@ -5,7 +5,8 @@ The following is a set of rules for contributing to Kudobot. (Well, they're more
 
 ## How to contribute to Kudobot
 
-Just submit a Poll Request! Ease as pie. 
+Just submit a Pull Request! Ease as pie. 
+Please follow [conventional commit standards](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ###Did you find a bug?
 
