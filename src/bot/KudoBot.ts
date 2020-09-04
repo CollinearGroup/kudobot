@@ -6,15 +6,17 @@ import {
 } from "botbuilder";
 import { GetLeaderboardUseCase } from "../kudo/GetLeaderboardUseCase";
 import { GiveKudoUseCase } from "../kudo/GiveKudoUseCase";
-import { LEADERBOARD, HELP, GIVE_KUDO } from "./Commands";
+import { LEADERBOARD, HELP, GIVE_KUDO, BUILD_NUM } from "./Commands";
 import { GetHelpUseCase } from "./GetHelpTextUseCase";
 import { getAtCommands, getMentions } from "../util/TextParseUtils";
+import { GetBuildNumUseCase } from "../kudo/GetBuildNumUseCase";
 
 export class KudoBot extends ActivityHandler {
   constructor(
     private getLeaderBoardUseCase: GetLeaderboardUseCase,
     private giveKudoUseCase: GiveKudoUseCase,
-    private getHelpUseCase: GetHelpUseCase
+    private getHelpUseCase: GetHelpUseCase,
+    private getBuildNumUseCase: GetBuildNumUseCase
   ) {
     super();
     this.onMessage(async (context, next) => {
@@ -30,6 +32,9 @@ export class KudoBot extends ActivityHandler {
         case GIVE_KUDO:
           await this.handleGiveKudo(context);
           break;
+        case BUILD_NUM:
+          await this.handleBuildNum(context);
+          break;
         default:
           await this.handleDefault(context);
           break;
@@ -37,6 +42,10 @@ export class KudoBot extends ActivityHandler {
 
       await next();
     });
+  }
+
+  private async handleBuildNum(context: TurnContext) {
+    await this.sendReply(this.getBuildNumUseCase.get(), context);
   }
 
   private async handleDefault(context: TurnContext) {
@@ -90,6 +99,7 @@ export class KudoBot extends ActivityHandler {
     let firstCommand = getAtCommands(activity.text)[0];
     if (LEADERBOARD === firstCommand) return LEADERBOARD;
     if (HELP === firstCommand) return HELP;
+    if (BUILD_NUM === firstCommand) return BUILD_NUM;
 
     return "UNKNOWN";
   }
