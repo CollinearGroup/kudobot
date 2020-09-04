@@ -11,6 +11,7 @@
     "start": "tsc --build && node ./lib/index.js",
     "test": "jest --collect-coverage",
     "test-watch": "jest --watchAll",
+    "test-staged": "jest --coverage --changedSince=master",
     "watch": "nodemon --watch ./src -e ts --exec \"npm run start\"",
     "make-badges": "istanbul-badges-readme"
   },
@@ -40,7 +41,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged && npm test && istanbul-badges-readme && git add 'README.md'"
+      "pre-commit": "pretty-quick && npm run test-staged"
     }
   }
 }
