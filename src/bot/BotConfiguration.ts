@@ -6,6 +6,7 @@ import { GetHelpUseCase } from "./GetHelpTextUseCase";
 import { KudoBot } from "./KudoBot";
 import { KudoRecordDBGateway } from "../kudo/KudoRecordDBGateway";
 import { TeamsGateway } from "../kudo/TeamsGateway";
+import { GetBuildNumUseCase } from "../kudo/GetBuildNumUseCase";
 
 export function createBot(
   dbGateway: KudoRecordDBGateway,
@@ -17,5 +18,11 @@ export function createBot(
   );
   const giveKudoUseCase = new GiveKudoUseCase(dbGateway);
   const getHelpUseCase = new GetHelpUseCase();
-  return new KudoBot(getLeaderboardUseCase, giveKudoUseCase, getHelpUseCase);
+  const getBuildNumUseCase = new GetBuildNumUseCase();
+  return new KudoBot(
+    getLeaderboardUseCase,
+    giveKudoUseCase,
+    getHelpUseCase,
+    getBuildNumUseCase
+  );
 }
