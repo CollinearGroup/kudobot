@@ -7,7 +7,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsc --build",
-    "postinstall": "npm run build && node ./deploymentScripts/webConfigPrep.js",
+    "postinstall": "npm run build",
     "start": "tsc --build && node ./lib/index.js",
     "test": "jest --collect-coverage",
     "test-watch": "jest --watchAll",
