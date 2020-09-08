@@ -1,14 +1,20 @@
 import {
   ActivityHandler,
   MessageFactory,
-  TurnContext,
   TeamsInfo,
+  TurnContext,
 } from "botbuilder";
 import { GetLeaderboardUseCase } from "../kudo/GetLeaderboardUseCase";
 import { GiveKudoUseCase } from "../kudo/GiveKudoUseCase";
-import { LEADERBOARD, HELP, GIVE_KUDO, BUILD_NUM } from "./Commands";
+import {
+  BUILD,
+  getFirstCommand,
+  GIVE_KUDO,
+  HELP,
+  LEADERBOARD,
+} from "./Commands";
 import { GetHelpUseCase } from "./GetHelpTextUseCase";
-import { getAtCommands, getMentions } from "../util/TextParseUtils";
+import { getMentions } from "../util/TextParseUtils";
 import { GetBuildNumUseCase } from "../kudo/GetBuildNumUseCase";
 
 export class KudoBot extends ActivityHandler {
@@ -32,7 +38,7 @@ export class KudoBot extends ActivityHandler {
         case GIVE_KUDO:
           await this.handleGiveKudo(context);
           break;
-        case BUILD_NUM:
+        case BUILD:
           await this.handleBuildNum(context);
           break;
         default:
@@ -53,7 +59,7 @@ export class KudoBot extends ActivityHandler {
     let replyText = `Something I can do for you ${
       context.activity.from.name.split(" ")[0]
     }?<br>`;
-    replyText += `Try @${botName} @help for a list of things I can do!`;
+    replyText += `Try "@${botName} help" for a list of things I can do!`;
     await this.sendReply(replyText, context);
   }
 
@@ -96,10 +102,10 @@ export class KudoBot extends ActivityHandler {
       if (activity.text.includes(incrementedName)) return GIVE_KUDO;
     }
 
-    let firstCommand = getAtCommands(activity.text)[0];
+    let firstCommand = getFirstCommand(activity.text);
     if (LEADERBOARD === firstCommand) return LEADERBOARD;
     if (HELP === firstCommand) return HELP;
-    if (BUILD_NUM === firstCommand) return BUILD_NUM;
+    if (BUILD === firstCommand) return BUILD;
 
     return "UNKNOWN";
   }
