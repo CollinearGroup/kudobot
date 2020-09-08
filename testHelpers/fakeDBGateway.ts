@@ -1,24 +1,25 @@
-import { KudoRecordDBGateway } from "../src/kudo/KudoRecordDBGateway";
-import { KudoRecord, NoopKudoRecord } from "../src/kudo/KudoRecord";
-export class FakeKudoDbGateway implements KudoRecordDBGateway {
-  private kudoRecords: KudoRecord[] = [];
+import { PointRecordDBGateway } from "../src/point/PointRecordDBGateway";
+import { PointRecord, NoopPointRecord } from "../src/point/PointRecord";
+export class FakePointDbGateway implements PointRecordDBGateway {
+  private pointRecords: PointRecord[] = [];
 
-  save(kudoRecord: KudoRecord): void {
-    if (this.findRecord(kudoRecord.personId, kudoRecord.teamId).exists()) {
-      this.kudoRecords = this.kudoRecords.filter(
-        (each) => !each.equals(kudoRecord)
+  save(pointRecord: PointRecord): void {
+    if (this.findRecord(pointRecord.personId, pointRecord.teamId).exists()) {
+      this.pointRecords = this.pointRecords.filter(
+        (each) => !each.equals(pointRecord)
       );
     }
-    this.kudoRecords.push(kudoRecord);
+    this.pointRecords.push(pointRecord);
   }
 
-  findRecord(personId: string, teamId: string): KudoRecord {
+  findRecord(personId: string, teamId: string): PointRecord {
     return (
-      this.kudoRecords.find((kudo) => kudo.personId === personId) ||
-      new NoopKudoRecord()
+      this.pointRecords.find(
+        (pointRecord) => pointRecord.personId === personId
+      ) || new NoopPointRecord()
     );
   }
   getAllRecords(teamId: string) {
-    return this.kudoRecords.filter((record) => record.teamId == teamId);
+    return this.pointRecords.filter((record) => record.teamId == teamId);
   }
 }

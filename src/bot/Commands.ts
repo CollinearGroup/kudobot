@@ -1,5 +1,5 @@
 export const LEADERBOARD = "leaderboard";
-export const GIVE_KUDO = "give_kudo";
+export const GIVE_POINT = "give_point";
 export const HELP = "help";
 export const BUILD = "build";
 

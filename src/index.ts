@@ -6,7 +6,7 @@ import { config } from "dotenv";
 import express = require("express");
 import { BotFrameworkAdapter } from "botbuilder";
 import { TeamsGatewayImpl } from "./teams/TeamsGatewayImpl";
-import { KudoRecordFileDbGateway } from "./db/KudoRecordFileDbGateway";
+import { PointRecordFileDbGateway } from "./db/PointRecordFileDbGateway";
 import { createBot } from "./bot/BotConfiguration";
 
 config();
@@ -44,9 +44,9 @@ const onTurnErrorHandler = async (context, error) => {
 adapter.onTurnError = onTurnErrorHandler;
 
 // Bot initialization
-const kudoFileDbGateway = new KudoRecordFileDbGateway();
+const pointFileDbGateway = new PointRecordFileDbGateway();
 const teamsGateway = new TeamsGatewayImpl();
-const kudoBot = createBot(kudoFileDbGateway, teamsGateway);
+const kudoBot = createBot(pointFileDbGateway, teamsGateway);
 
 const app: express.Application = express();
 const server = app.listen(process.env.PORT || 3978, () => {

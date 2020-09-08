@@ -6,11 +6,6 @@ export class GetHelpUseCase {
     if (command.match("leaderboard")) {
       return `"@${botName} leaderboard" will output the current leaderboard`;
     }
-    if (process.env.IS_TESTING) {
-      if (command.match("gendummydata")) {
-        return `"@${botName} genDummyData" will generate a bunch of dummy people and kudos`;
-      }
-    }
     return `"@${botName} help command" will output more info about that command.`;
   }
 }

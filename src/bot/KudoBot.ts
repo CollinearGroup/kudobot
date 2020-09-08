@@ -4,23 +4,23 @@ import {
   TeamsInfo,
   TurnContext,
 } from "botbuilder";
-import { GetLeaderboardUseCase } from "../kudo/GetLeaderboardUseCase";
-import { GiveKudoUseCase } from "../kudo/GiveKudoUseCase";
+import { GetLeaderboardUseCase } from "../point/GetLeaderboardUseCase";
+import { GivePointUseCase } from "../point/GivePointUseCase";
 import {
   BUILD,
   getFirstCommand,
-  GIVE_KUDO,
+  GIVE_POINT,
   HELP,
   LEADERBOARD,
 } from "./Commands";
 import { GetHelpUseCase } from "./GetHelpTextUseCase";
 import { getMentions } from "../util/TextParseUtils";
-import { GetBuildNumUseCase } from "../kudo/GetBuildNumUseCase";
+import { GetBuildNumUseCase } from "../point/GetBuildNumUseCase";
 
 export class KudoBot extends ActivityHandler {
   constructor(
     private getLeaderBoardUseCase: GetLeaderboardUseCase,
-    private giveKudoUseCase: GiveKudoUseCase,
+    private givePointUseCase: GivePointUseCase,
     private getHelpUseCase: GetHelpUseCase,
     private getBuildNumUseCase: GetBuildNumUseCase
   ) {
@@ -35,8 +35,8 @@ export class KudoBot extends ActivityHandler {
         case HELP:
           await this.handleHelp(context);
           break;
-        case GIVE_KUDO:
-          await this.handleGiveKudo(context);
+        case GIVE_POINT:
+          await this.handleGivePoint(context);
           break;
         case BUILD:
           await this.handleBuildNum(context);
@@ -73,10 +73,10 @@ export class KudoBot extends ActivityHandler {
     await this.sendReply(reply, context);
   }
 
-  private async handleGiveKudo(context: TurnContext) {
+  private async handleGivePoint(context: TurnContext) {
     const teamDetails = await TeamsInfo.getTeamDetails(context);
     const { mentioned } = getMentions(context.activity)[0];
-    const reply = this.giveKudoUseCase.giveKudo(
+    const reply = this.givePointUseCase.givePoint(
       mentioned.id,
       mentioned.name,
       teamDetails.id
@@ -99,7 +99,7 @@ export class KudoBot extends ActivityHandler {
         mentioned: { name },
       } = mentions[0];
       const incrementedName = `${name}</at>++`;
-      if (activity.text.includes(incrementedName)) return GIVE_KUDO;
+      if (activity.text.includes(incrementedName)) return GIVE_POINT;
     }
 
     let firstCommand = getFirstCommand(activity.text);

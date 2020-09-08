@@ -1,4 +1,4 @@
-import { TeamsGateway } from "../src/kudo/TeamsGateway";
+import { TeamsGateway } from "../src/point/TeamsGateway";
 import { TurnContext, TeamDetails } from "botbuilder";
 
 export class FakeTeamsGateway implements TeamsGateway {
