@@ -1,21 +1,21 @@
-export class KudoRecord {
+export class PointRecord {
   constructor(
     public personId: string,
     public personName: string,
     public teamId: string,
-    public kudos = 0
+    public points = 0
   ) {}
 
   exists() {
     return true;
   }
 
-  equals(other: KudoRecord): boolean {
+  equals(other: PointRecord): boolean {
     return this.personId === other.personId && this.teamId === other.teamId;
   }
 }
 
-export class NoopKudoRecord extends KudoRecord {
+export class NoopPointRecord extends PointRecord {
   constructor() {
     super("", "", "", 0);
   }

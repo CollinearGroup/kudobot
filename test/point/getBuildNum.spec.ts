@@ -1,4 +1,4 @@
-import { GetBuildNumUseCase } from "../../src/kudo/GetBuildNumUseCase";
+import { GetBuildNumUseCase } from "../../src/point/GetBuildNumUseCase";
 
 test("Should return the current build number", async () => {
   const getBuildNumUseCase = new GetBuildNumUseCase();

@@ -1,27 +1,27 @@
-import { KudoRecordFileDbGateway } from "../db/KudoRecordFileDbGateway";
+import { PointRecordFileDbGateway } from "../db/PointRecordFileDbGateway";
 import { TeamsGatewayImpl } from "../teams/TeamsGatewayImpl";
-import { GetLeaderboardUseCase } from "../kudo/GetLeaderboardUseCase";
-import { GiveKudoUseCase } from "../kudo/GiveKudoUseCase";
+import { GetLeaderboardUseCase } from "../point/GetLeaderboardUseCase";
+import { GivePointUseCase } from "../point/GivePointUseCase";
 import { GetHelpUseCase } from "./GetHelpTextUseCase";
 import { KudoBot } from "./KudoBot";
-import { KudoRecordDBGateway } from "../kudo/KudoRecordDBGateway";
-import { TeamsGateway } from "../kudo/TeamsGateway";
-import { GetBuildNumUseCase } from "../kudo/GetBuildNumUseCase";
+import { PointRecordDBGateway } from "../point/PointRecordDBGateway";
+import { TeamsGateway } from "../point/TeamsGateway";
+import { GetBuildNumUseCase } from "../point/GetBuildNumUseCase";
 
 export function createBot(
-  dbGateway: KudoRecordDBGateway,
+  dbGateway: PointRecordDBGateway,
   teamsGateway: TeamsGateway
 ) {
   const getLeaderboardUseCase = new GetLeaderboardUseCase(
     dbGateway,
     teamsGateway
   );
-  const giveKudoUseCase = new GiveKudoUseCase(dbGateway);
+  const givePointUseCase = new GivePointUseCase(dbGateway);
   const getHelpUseCase = new GetHelpUseCase();
   const getBuildNumUseCase = new GetBuildNumUseCase();
   return new KudoBot(
     getLeaderboardUseCase,
-    giveKudoUseCase,
+    givePointUseCase,
     getHelpUseCase,
     getBuildNumUseCase
   );

@@ -1,6 +1,6 @@
-import { FakeKudoDbGateway } from "../../testHelpers/fakeDBGateway";
-import { KudoRecord } from "../../src/kudo/KudoRecord";
-import { GetLeaderboardUseCase } from "../../src/kudo/GetLeaderboardUseCase";
+import { FakePointDbGateway } from "../../testHelpers/fakeDBGateway";
+import { PointRecord } from "../../src/point/PointRecord";
+import { GetLeaderboardUseCase } from "../../src/point/GetLeaderboardUseCase";
 import { FakeTeamsGateway } from "../../testHelpers/fakeTeamsGateway";
 import { TeamsInfo, TestAdapter, TurnContext, TeamDetails } from "botbuilder";
 import { TeamsGatewayImpl } from "../../src/teams/TeamsGatewayImpl";
@@ -14,13 +14,13 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  const fakeDBGateway = new FakeKudoDbGateway();
-  fakeDBGateway.save(new KudoRecord("1", "Carlos", TEAM_ID, 3));
-  fakeDBGateway.save(new KudoRecord("1", "Carlos", TEAM_ID, 4));
-  fakeDBGateway.save(new KudoRecord("1", "Carlos", TEAM_ID, 5));
+  const fakeDBGateway = new FakePointDbGateway();
+  fakeDBGateway.save(new PointRecord("1", "Carlos", TEAM_ID, 3));
+  fakeDBGateway.save(new PointRecord("1", "Carlos", TEAM_ID, 4));
+  fakeDBGateway.save(new PointRecord("1", "Carlos", TEAM_ID, 5));
 
-  fakeDBGateway.save(new KudoRecord("3", "Jeff", TEAM_ID, 1));
-  fakeDBGateway.save(new KudoRecord("2", "Miguel", TEAM_ID, 2));
+  fakeDBGateway.save(new PointRecord("3", "Jeff", TEAM_ID, 1));
+  fakeDBGateway.save(new PointRecord("2", "Miguel", TEAM_ID, 2));
 
   getLeaderboardUseCase = new GetLeaderboardUseCase(
     fakeDBGateway,

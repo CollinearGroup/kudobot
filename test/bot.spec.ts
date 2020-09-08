@@ -1,13 +1,13 @@
-import { FakeKudoDbGateway } from "../testHelpers/fakeDBGateway";
+import { FakePointDbGateway } from "../testHelpers/fakeDBGateway";
 import { FakeTeamsGateway } from "../testHelpers/fakeTeamsGateway";
 import { TeamsInfo, TestAdapter } from "botbuilder";
 import { createBot } from "../src/bot/BotConfiguration";
-import { KudoRecord } from "../src/kudo/KudoRecord";
+import { PointRecord } from "../src/point/PointRecord";
 import { TeamsGatewayImpl } from "../src/teams/TeamsGatewayImpl";
 
-const fakeKudoDbGateway = new FakeKudoDbGateway();
+const fakePointDbGateway = new FakePointDbGateway();
 
-const bot = createBot(fakeKudoDbGateway, new TeamsGatewayImpl());
+const bot = createBot(fakePointDbGateway, new TeamsGatewayImpl());
 const TEAM_ID = "FAKE_TEAM_ID";
 const testAdapter = new TestAdapter(async (context) => bot.run(context));
 
@@ -19,14 +19,14 @@ beforeAll(() => {
 
 test("When sending 'leaderboard' get leaderboard output", async () => {
   const points = [5, 4, 1];
-  fakeKudoDbGateway.save(
-    new KudoRecord("1", "Test User 1", TEAM_ID, points[0])
+  fakePointDbGateway.save(
+    new PointRecord("1", "Test User 1", TEAM_ID, points[0])
   );
-  fakeKudoDbGateway.save(
-    new KudoRecord("2", "Test User 2", TEAM_ID, points[1])
+  fakePointDbGateway.save(
+    new PointRecord("2", "Test User 2", TEAM_ID, points[1])
   );
-  fakeKudoDbGateway.save(
-    new KudoRecord("3", "Test User 3", TEAM_ID, points[2])
+  fakePointDbGateway.save(
+    new PointRecord("3", "Test User 3", TEAM_ID, points[2])
   );
   await testAdapter.test(
     "leaderboard",

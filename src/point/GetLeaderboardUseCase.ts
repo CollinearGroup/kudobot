@@ -1,11 +1,11 @@
-import { KudoRecordDBGateway } from "./KudoRecordDBGateway";
+import { PointRecordDBGateway } from "./PointRecordDBGateway";
 import { TeamsGateway } from "./TeamsGateway";
 import { TurnContext } from "botbuilder";
-import { KudoRecord } from "./KudoRecord";
+import { PointRecord } from "./PointRecord";
 
 export class GetLeaderboardUseCase {
   constructor(
-    private kudoRecordDBGateway: KudoRecordDBGateway,
+    private pointRecordDBGateway: PointRecordDBGateway,
     private teamsGateway: TeamsGateway
   ) {}
 
@@ -14,9 +14,9 @@ export class GetLeaderboardUseCase {
       id: teamId,
       name: teamName,
     } = await this.teamsGateway.getTeamDetails(msgContext);
-    const allRecords = this.kudoRecordDBGateway.getAllRecords(teamId);
+    const allRecords = this.pointRecordDBGateway.getAllRecords(teamId);
     const sortedAllRecords = allRecords.sort((a, b) =>
-      a.kudos > b.kudos ? -1 : 1
+      a.points > b.points ? -1 : 1
     );
 
     const leaderBoard = sortedAllRecords
@@ -25,9 +25,9 @@ export class GetLeaderboardUseCase {
     return `**${teamName}**\n\n${leaderBoard}`;
   }
 
-  private recordToRow(record: KudoRecord, row: number) {
-    return `${row}. ${record.personName} has *${record.kudos}* point${
-      record.kudos > 1 ? "s" : ""
+  private recordToRow(record: PointRecord, row: number) {
+    return `${row}. ${record.personName} has *${record.points}* point${
+      record.points > 1 ? "s" : ""
     }.`;
   }
 }
