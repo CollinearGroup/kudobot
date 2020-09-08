@@ -22,12 +22,13 @@
   "dependencies": {
     "botbuilder": "~4.9.1",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "fs": "0.0.1-security",
-    "replace": "~1.1.1",
-    "restify": "~8.5.1"
+    "replace": "~1.1.1"
   },
   "devDependencies": {
     "@types/dotenv": "6.1.1",
+    "@types/express": "^4.17.8",
     "@types/jest": "^26.0.10",
     "@types/restify": "8.4.2",
     "husky": "^4.2.5",
