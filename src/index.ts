@@ -2,36 +2,14 @@
 // Licensed under the MIT License.
 
 import * as path from "path";
-
 import { config } from "dotenv";
-const ENV_FILE = path.join(__dirname, "..", ".env");
-config({ path: ENV_FILE });
-
-import * as restify from "restify";
-
-// Import required bot services.
-// See https://aka.ms/bot-services to learn more about the different parts of a bot.
-
+import express = require("express");
 import { BotFrameworkAdapter } from "botbuilder";
-
-// This bot's main dialog.
-import { KudoBot } from "./bot/KudoBot";
-import { GetLeaderboardUseCase } from "./kudo/GetLeaderboardUseCase";
 import { TeamsGatewayImpl } from "./teams/TeamsGatewayImpl";
-import { GiveKudoUseCase } from "./kudo/GiveKudoUseCase";
 import { KudoRecordFileDbGateway } from "./db/KudoRecordFileDbGateway";
-import { GetHelpUseCase } from "./bot/GetHelpTextUseCase";
 import { createBot } from "./bot/BotConfiguration";
 
-// Create HTTP server.
-const server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 3978, () => {
-  console.log(`\n${server.name} listening to ${server.url}`);
-  console.log(
-    "\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator"
-  );
-  console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
-});
+config();
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about adapters.
@@ -70,9 +48,12 @@ const kudoFileDbGateway = new KudoRecordFileDbGateway();
 const teamsGateway = new TeamsGatewayImpl();
 const kudoBot = createBot(kudoFileDbGateway, teamsGateway);
 
-// Listen for incoming requests.
+const app: express.Application = express();
+const server = app.listen(process.env.PORT || 3978, () => {
+  console.log(`App is listening on port ${process.env.PORT || 3978}!`);
+});
 
-server.post("/api/messages", (req, res) => {
+app.post("/api/messages", (req, res) => {
   adapter.processActivity(req, res, async (context) => {
     // Route to main dialog.
     await kudoBot.run(context);
