@@ -76,5 +76,5 @@ jobs:
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: kudobot-server
-        cluster: default
+        cluster: kudobot-cluster
         wait-for-service-stability: true
