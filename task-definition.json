@@ -1,0 +1,86 @@
+{
+  "ipcMode": null,
+  "executionRoleArn": null,
+  "containerDefinitions": [
+    {
+      "dnsSearchDomains": null,
+      "environmentFiles": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/kudobot-server",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "entryPoint": null,
+      "portMappings": [
+        {
+          "hostPort": 3978,
+          "protocol": "tcp",
+          "containerPort": 3978
+        }
+      ],
+      "command": null,
+      "linuxParameters": null,
+      "cpu": 0,
+      "environment": [
+        {
+          "name": "BOT_NAME",
+          "value": "KudoBot"
+        }
+      ],
+      "resourceRequirements": null,
+      "ulimits": null,
+      "dnsServers": null,
+      "mountPoints": null,
+      "workingDirectory": null,
+      "secrets": [
+        {
+          "name": "MicrosoftAppId",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:917701901451:secret:KudoBotMicrosoftCredentials-pCa2ma:KudoBotMicrosoftAppId"
+        },
+        {
+          "name": "MicrosoftAppPassword",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:917701901451:secret:KudoBotMicrosoftCredentials-pCa2ma:KudoBotMicrosoftAppPassword"
+        }
+      ],
+      "dockerSecurityOptions": null,
+      "memory": 256,
+      "volumesFrom": null,
+      "stopTimeout": null,
+      "image": "917701901451.dkr.ecr.us-east-2.amazonaws.com/kudobot:5e404a830803c03e44791002b10728ef97864f19",
+      "startTimeout": null,
+      "firelensConfiguration": null,
+      "dependsOn": null,
+      "disableNetworking": null,
+      "interactive": null,
+      "healthCheck": null,
+      "essential": true,
+      "links": null,
+      "hostname": null,
+      "extraHosts": null,
+      "pseudoTerminal": null,
+      "user": null,
+      "readonlyRootFilesystem": null,
+      "dockerLabels": {
+        "app": "kudobot"
+      },
+      "systemControls": null,
+      "privileged": null,
+      "name": "kudobot-server"
+    }
+  ],
+  "memory": null,
+  "taskRoleArn": "arn:aws:iam::917701901451:role/ecsTaskExecutionRole",
+  "family": "kudobot-server",
+  "pidMode": null,
+  "requiresCompatibilities": ["EC2"],
+  "networkMode": null,
+  "cpu": null,
+  "inferenceAccelerators": [],
+  "proxyConfiguration": null,
+  "volumes": [],
+  "placementConstraints": [],
+  "tags": []
+}
