@@ -1,0 +1,21 @@
+# This workflow will run npm install and npm test on every pull request
+
+name: Compile & Test Pull Request
+on: [pull_request]
+
+jobs:
+  label:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Build and Test
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.18.3
+    - run: npm ci
+    - run: npm test
+      env:
+        CI: true
