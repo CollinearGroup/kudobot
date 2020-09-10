@@ -38,11 +38,11 @@
       "secrets": [
         {
           "name": "MicrosoftAppId",
-          "valueFrom": "arn:aws:secretsmanager:us-east-2:917701901451:secret:KudoBotMicrosoftCredentials-pCa2ma:KudoBotMicrosoftAppId"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:917701901451:secret:KudoBotMicrosoftCredentials-pCa2ma:KudoBotMicrosoftAppId::"
         },
         {
           "name": "MicrosoftAppPassword",
-          "valueFrom": "arn:aws:secretsmanager:us-east-2:917701901451:secret:KudoBotMicrosoftCredentials-pCa2ma:KudoBotMicrosoftAppPassword"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:917701901451:secret:KudoBotMicrosoftCredentials-pCa2ma:KudoBotMicrosoftAppPassword::"
         }
       ],
       "dockerSecurityOptions": null,
