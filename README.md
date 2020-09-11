@@ -22,7 +22,7 @@
 
 ## Add the bot to a team --
 
-- Update the Manifest file (included in the manifest zip) by replacing all instances of <<YOUR-MICROSOFT-APP-ID>> with your AppId
+- Update the Manifest file (included in the manifest zip) by replacing all instances of `<<YOUR-MICROSOFT-APP-ID>>` with your AppId
 - In MSTeams, navigate to Manage Team
   - Click the "Apps" Tab
   - Click "Upload a custom app" (in the bottom right corner)
