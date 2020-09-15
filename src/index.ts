@@ -1,13 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as path from "path";
 import { config } from "dotenv";
-import express = require("express");
 import { BotFrameworkAdapter } from "botbuilder";
 import { TeamsGatewayImpl } from "./teams/TeamsGatewayImpl";
 import { PointRecordFileDbGateway } from "./db/PointRecordFileDbGateway";
 import { createBot } from "./bot/BotConfiguration";
+import express = require("express");
 
 config();
 
@@ -57,6 +56,11 @@ app.post("/api/messages", (req, res) => {
   adapter.processActivity(req, res, async (context) => {
     // Route to main dialog.
     await kudoBot.run(context);
+  });
+});
+app.get("/info", (req, res) => {
+  res.send({
+    version: process.env.npm_package_version,
   });
 });
 
