@@ -23,7 +23,8 @@ export class PointRecordFileDbGateway implements PointRecordDBGateway {
         object.personId,
         object.personName,
         object.teamId,
-        object.points
+        object.points,
+        object.date
       );
     });
   }

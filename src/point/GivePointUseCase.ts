@@ -14,7 +14,13 @@ export class GivePointUseCase {
       teamId
     );
     if (!record.exists()) {
-      record = new PointRecord(personTeamsId, personName, teamId, 0);
+      record = new PointRecord(
+        personTeamsId,
+        personName,
+        teamId,
+        0,
+        new Date()
+      );
     }
     record.points++;
     this.pointRecordDb.save(record);

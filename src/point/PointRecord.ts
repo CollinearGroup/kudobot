@@ -3,7 +3,8 @@ export class PointRecord {
     public personId: string,
     public personName: string,
     public teamId: string,
-    public points = 0
+    public points = 0,
+    public createdAt: Date = new Date()
   ) {}
 
   exists() {
@@ -17,7 +18,7 @@ export class PointRecord {
 
 export class NoopPointRecord extends PointRecord {
   constructor() {
-    super("", "", "", 0);
+    super("", "", "", 0, null);
   }
 
   exists() {
