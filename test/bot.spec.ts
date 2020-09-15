@@ -1,4 +1,4 @@
-import { FakePointDbGateway } from "../testHelpers/fakeDBGateway";
+import { FakePointDbGateway, generatePoints } from "../testHelpers/fakeDBGateway";
 import { FakeTeamsGateway } from "../testHelpers/fakeTeamsGateway";
 import { TeamsInfo, TestAdapter } from "botbuilder";
 import { createBot } from "../src/bot/BotConfiguration";
@@ -13,24 +13,16 @@ const testAdapter = new TestAdapter(async (context) => bot.run(context));
 
 beforeAll(() => {
   process.env.BOT_NAME = "KudoBot";
-  TeamsInfo.getTeamDetails = (context) =>
-    new FakeTeamsGateway(TEAM_ID).getTeamDetails(context);
+  TeamsInfo.getTeamDetails = (context) => new FakeTeamsGateway(TEAM_ID).getTeamDetails(context);
 });
 
 test("When sending 'leaderboard' get leaderboard output", async () => {
-  const points = [5, 4, 1];
-  fakePointDbGateway.save(
-    new PointRecord("1", "Test User 1", TEAM_ID, points[0])
-  );
-  fakePointDbGateway.save(
-    new PointRecord("2", "Test User 2", TEAM_ID, points[1])
-  );
-  fakePointDbGateway.save(
-    new PointRecord("3", "Test User 3", TEAM_ID, points[2])
-  );
+  fakePointDbGateway.save(new PointRecord("1", "Test User 1", TEAM_ID, generatePoints(5)));
+  fakePointDbGateway.save(new PointRecord("2", "Test User 2", TEAM_ID, generatePoints(4)));
+  fakePointDbGateway.save(new PointRecord("3", "Test User 3", TEAM_ID, generatePoints(1)));
   await testAdapter.test(
     "leaderboard",
-    `**Team Fake**\n\n1. Test User 1 has *${points[0]}* points.\n2. Test User 2 has *${points[1]}* points.\n3. Test User 3 has *${points[2]}* point.`
+    `**Team Fake**\n\n1. Test User 1 has *5* points.\n2. Test User 2 has *4* points.\n3. Test User 3 has *1* point.`
   );
 });
 test("When sending 'help leaderboard' get help text about that command", async () => {
