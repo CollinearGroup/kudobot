@@ -15,4 +15,4 @@ Please follow [conventional commit standards](https://www.conventionalcommits.or
     * If you're unable to find an open issue addressing the problem, open a new one. 
         * Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
 
-## Be excellent to eachother!
+## Be excellent to each other!
