@@ -7,50 +7,37 @@ export class PointRecordFileDbGateway implements PointRecordDBGateway {
 
   constructor(private localPointStoreFile = "boards.json") {
     if (!fs.existsSync(this.localPointStoreFile)) {
-      fs.writeFileSync(
-        this.localPointStoreFile,
-        JSON.stringify(new Array<PointRecord>())
-      );
+      fs.writeFileSync(this.localPointStoreFile, JSON.stringify(new Array<PointRecord>()));
       this.pointRecords = [];
       return;
     }
 
-    const parsedObjects = JSON.parse(
-      fs.readFileSync(this.localPointStoreFile).toString()
-    );
+    const parsedObjects = JSON.parse(fs.readFileSync(this.localPointStoreFile).toString());
     this.pointRecords = parsedObjects.map((object) => {
-      return new PointRecord(
-        object.personId,
-        object.personName,
-        object.teamId,
-        object.points,
-        object.date
-      );
+      return new PointRecord(object.personId, object.personName, object.teamId, object.points);
     });
   }
 
-  public findRecord(personId: string, teamId: string): PointRecord {
+  findRecord(personId: string, teamId: string): PointRecord {
     return (
-      this.pointRecords.find(
-        (record) => record.teamId == teamId && record.personId == personId
-      ) || new NoopPointRecord()
+      this.pointRecords.find((record) => record.teamId == teamId && record.personId == personId) ||
+      new NoopPointRecord()
     );
   }
 
-  public save(pointRecord: PointRecord) {
+  save(pointRecord: PointRecord) {
     if (this.findRecord(pointRecord.personId, pointRecord.teamId).exists()) {
-      this.pointRecords = this.pointRecords.filter(
-        (each) => !each.equals(pointRecord)
-      );
+      this.pointRecords = this.pointRecords.filter((each) => !each.equals(pointRecord));
     }
     this.pointRecords.push(pointRecord);
-    fs.writeFileSync(
-      this.localPointStoreFile,
-      JSON.stringify(this.pointRecords)
-    );
+    this.persistToFile();
   }
 
-  public getAllRecords(teamId: string): Array<PointRecord> {
+  getAllRecords(teamId: string): Array<PointRecord> {
     return this.pointRecords.filter((record) => record.teamId == teamId);
+  }
+
+  private persistToFile() {
+    fs.writeFileSync(this.localPointStoreFile, JSON.stringify(this.pointRecords));
   }
 }

@@ -10,14 +10,9 @@ export class GetLeaderboardUseCase {
   ) {}
 
   async get(msgContext: TurnContext) {
-    const {
-      id: teamId,
-      name: teamName,
-    } = await this.teamsGateway.getTeamDetails(msgContext);
+    const { id: teamId, name: teamName } = await this.teamsGateway.getTeamDetails(msgContext);
     const allRecords = this.pointRecordDBGateway.getAllRecords(teamId);
-    const sortedAllRecords = allRecords.sort((a, b) =>
-      a.points > b.points ? -1 : 1
-    );
+    const sortedAllRecords = allRecords.sort((a, b) => (a.getScore() > b.getScore() ? -1 : 1));
 
     const leaderBoard = sortedAllRecords
       .map((record, index) => this.recordToRow(record, index + 1))
@@ -26,8 +21,7 @@ export class GetLeaderboardUseCase {
   }
 
   private recordToRow(record: PointRecord, row: number) {
-    return `${row}. ${record.personName} has *${record.points}* point${
-      record.points > 1 ? "s" : ""
-    }.`;
+    const score = record.getScore();
+    return `${row}. ${record.personName} has *${score}* point${score > 1 ? "s" : ""}.`;
   }
 }

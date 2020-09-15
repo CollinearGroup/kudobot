@@ -1,11 +1,21 @@
+import { Point } from "./Point";
+
 export class PointRecord {
   constructor(
     public personId: string,
     public personName: string,
     public teamId: string,
-    public points = 0,
-    public createdAt: Date = new Date()
+    private points: Point[] = []
   ) {}
+
+  addPoint(point: Point = new Point()) {
+    this.points.push(point);
+  }
+
+  getScore(since: Date = null) {
+    since = since || new Date(new Date().setDate(new Date().getDate() - 30));
+    return this.points.filter((point) => point.createdAt > since).length;
+  }
 
   exists() {
     return true;
@@ -18,7 +28,7 @@ export class PointRecord {
 
 export class NoopPointRecord extends PointRecord {
   constructor() {
-    super("", "", "", 0, null);
+    super("", "", "");
   }
 
   exists() {
