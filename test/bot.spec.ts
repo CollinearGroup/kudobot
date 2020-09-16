@@ -12,7 +12,6 @@ const TEAM_ID = "FAKE_TEAM_ID";
 const testAdapter = new TestAdapter(async (context) => bot.run(context));
 
 beforeAll(() => {
-  process.env.BOT_NAME = "KudoBot";
   TeamsInfo.getTeamDetails = (context) => new FakeTeamsGateway(TEAM_ID).getTeamDetails(context);
 });
 

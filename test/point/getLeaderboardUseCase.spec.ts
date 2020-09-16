@@ -29,6 +29,7 @@ beforeEach(() => {
 
   getLeaderboardUseCase = new GetLeaderboardUseCase(fakeDBGateway, new TeamsGatewayImpl());
 });
+
 test("Should return leaderboard in desc order", async () => {
   const adapter = new TestAdapter(async (context) => {
     const response = await getLeaderboardUseCase.get(context);

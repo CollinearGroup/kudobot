@@ -1,18 +1,7 @@
-import {
-  ActivityHandler,
-  MessageFactory,
-  TeamsInfo,
-  TurnContext,
-} from "botbuilder";
+import { ActivityHandler, MessageFactory, TeamsInfo, TurnContext } from "botbuilder";
 import { GetLeaderboardUseCase } from "../point/GetLeaderboardUseCase";
 import { GivePointUseCase } from "../point/GivePointUseCase";
-import {
-  BUILD,
-  getFirstCommand,
-  GIVE_POINT,
-  HELP,
-  LEADERBOARD,
-} from "./Commands";
+import { BUILD, getFirstCommand, GIVE_POINT, HELP, LEADERBOARD } from "./Commands";
 import { GetHelpUseCase } from "./GetHelpTextUseCase";
 import { getMentions } from "../util/TextParseUtils";
 import { GetBuildNumUseCase } from "../point/GetBuildNumUseCase";
@@ -55,11 +44,8 @@ export class KudoBot extends ActivityHandler {
   }
 
   private async handleDefault(context: TurnContext) {
-    const botName = process.env.BOT_NAME || "KudoBot";
-    let replyText = `Something I can do for you ${
-      context.activity.from.name.split(" ")[0]
-    }?<br>`;
-    replyText += `Try "@${botName} help" for a list of things I can do!`;
+    let replyText = `Something I can do for you ${context.activity.from.name.split(" ")[0]}?<br>`;
+    replyText += `Try "@KudoBot help" for a list of things I can do!`;
     await this.sendReply(replyText, context);
   }
 
@@ -76,11 +62,7 @@ export class KudoBot extends ActivityHandler {
   private async handleGivePoint(context: TurnContext) {
     const teamDetails = await TeamsInfo.getTeamDetails(context);
     const { mentioned } = getMentions(context.activity)[0];
-    const reply = this.givePointUseCase.givePoint(
-      mentioned.id,
-      mentioned.name,
-      teamDetails.id
-    );
+    const reply = this.givePointUseCase.givePoint(mentioned.id, mentioned.name, teamDetails.id);
     await this.sendReply(reply, context);
   }
 
