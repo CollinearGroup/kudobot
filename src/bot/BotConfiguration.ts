@@ -8,21 +8,10 @@ import { PointRecordDBGateway } from "../point/PointRecordDBGateway";
 import { TeamsGateway } from "../point/TeamsGateway";
 import { GetBuildNumUseCase } from "../point/GetBuildNumUseCase";
 
-export function createBot(
-  dbGateway: PointRecordDBGateway,
-  teamsGateway: TeamsGateway
-) {
-  const getLeaderboardUseCase = new GetLeaderboardUseCase(
-    dbGateway,
-    teamsGateway
-  );
+export function createBot(dbGateway: PointRecordDBGateway, teamsGateway: TeamsGateway) {
+  const getLeaderboardUseCase = new GetLeaderboardUseCase(dbGateway, teamsGateway);
   const givePointUseCase = new GivePointUseCase(dbGateway);
   const getHelpUseCase = new GetHelpUseCase();
   const getBuildNumUseCase = new GetBuildNumUseCase();
-  return new KudoBot(
-    getLeaderboardUseCase,
-    givePointUseCase,
-    getHelpUseCase,
-    getBuildNumUseCase
-  );
+  return new KudoBot(getLeaderboardUseCase, givePointUseCase, getHelpUseCase, getBuildNumUseCase);
 }
