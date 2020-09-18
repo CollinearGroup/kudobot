@@ -13,7 +13,8 @@
     "test-watch": "jest --watchAll",
     "test-staged": "jest --coverage --changedSince=master",
     "watch": "nodemon --watch ./src -e ts --exec \"npm run start\"",
-    "make-badges": "istanbul-badges-readme"
+    "make-badges": "istanbul-badges-readme",
+    "generate-manifest": "zip manifest.zip manifest/*"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "@types/express": "^4.17.8",
     "@types/jest": "^26.0.10",
     "@types/restify": "8.4.2",
+    "bestzip": "^2.1.7",
     "husky": "^4.2.5",
     "istanbul-badges-readme": "^1.0.5",
     "jest": "^26.4.2",

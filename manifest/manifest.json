@@ -1,0 +1,90 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.7/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.7",
+  "version": "1.1.0",
+  "showLoadingIndicator": true,
+  "id": "<<YOUR-MICROSOFT-APP-ID>>",
+  "packageName": "KudoBot",
+  "developer": {
+    "name": "Collinear Group",
+    "websiteUrl": "https://www.collineargroup.com/",
+    "privacyUrl": "https://www.collineargroup.com/",
+    "termsOfUseUrl": "https://www.collineargroup.com/"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "KudoBot",
+    "full": "Kudo Leaderboard Bot"
+  },
+  "description": {
+    "short": "Chat bot for team specific leaderboard tracking",
+    "full": "KudoBot is a chat bot that watches for @mentions and keeps track of the number of points given to members on a leaderboard. Award points (Kudos) to increase visibility of outstanding contributors and encourage exceptional work through friendly competition. "
+  },
+  "accentColor": "#40497E",
+  "bots": [
+    {
+      "botId": "<<YOUR-MICROSOFT-APP-ID>>",
+      "scopes": ["groupchat", "team", "personal"],
+      "commandLists": [
+        {
+          "scopes": ["personal"],
+          "commands": [
+            {
+              "title": "leaderboard",
+              "description": "Output the leadearboard for this Team"
+            },
+            {
+              "title": "help",
+              "description": "Request information about how to use KudoBot"
+            },
+            {
+              "title": "build",
+              "description": "Display the current running version number"
+            }
+          ]
+        },
+        {
+          "scopes": ["team"],
+          "commands": [
+            {
+              "title": "leaderboard",
+              "description": "Output the leadearboard for this Team"
+            },
+            {
+              "title": "help",
+              "description": "Request information about how to use KudoBot"
+            },
+            {
+              "title": "build",
+              "description": "Display the current running version number"
+            }
+          ]
+        },
+        {
+          "scopes": ["groupchat"],
+          "commands": [
+            {
+              "title": "leaderboard",
+              "description": "Output the leadearboard for this Team"
+            },
+            {
+              "title": "help",
+              "description": "Request information about how to use KudoBot"
+            },
+            {
+              "title": "build",
+              "description": "Display the current running version number"
+            }
+          ]
+        }
+      ],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": []
+}
