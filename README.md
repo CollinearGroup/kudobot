@@ -50,7 +50,7 @@ Detailed instructions can be found in the sections below but here's the rough ou
 - In MSTeams, navigate to Manage Team
   - Click the "Apps" Tab
   - Click "Upload a custom app" (in the bottom right corner)
-    - Select the zip (downloaded in step 1)
+    - Select the manifest.zip
     - Click "Add". Wait... it might take a few seconds
 - Voila!
 - Test it out in a Teams channel by typing @KudoBot
