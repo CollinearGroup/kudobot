@@ -15,7 +15,7 @@ Detailed instructions can be found in the sections below but here's the rough ou
 
 1. Clone this repo and host your bot. (AWS, Azure, ngrok... etc)
 2. Register the app in your Azure account. (All teams bots must bounce messages through Azure, regardless of hosting choice in step 1)
-3. Update provided app manifest with your app ID (from step 2) and run `npm run generate manifest`
+3. Update provided app manifest with your app ID (from step 2) and run `npm run generate-manifest`
 4. Provided environment variables based on .env.example or create .env file with values set
 5. Update the Messaging Endpoint for your Azure app registration to point at your hosted bot. (https://...botURL.../api/messages)
 6. Add your custom app to the desired MS team using the manifest.zip (from step 3).
