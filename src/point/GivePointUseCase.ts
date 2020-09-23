@@ -1,5 +1,6 @@
 import { PointRecord } from "./PointRecord";
 import { PointRecordDBGateway } from "./PointRecordDBGateway";
+import * as fs from "fs";
 
 export class GivePointUseCase {
   constructor(private pointRecordDb: PointRecordDBGateway) {}
@@ -20,7 +21,7 @@ export class GivePointUseCase {
   }
 
   private getRandomEncouragement() {
-    const items = ["Great Job!", "You're crushing it!", "Well done.", "Wow!", "Excellent!"];
+    const items = fs.readFileSync("./encouragements.txt", "utf-8").split("\n");
     return items[Math.floor(Math.random() * items.length)];
   }
 }
